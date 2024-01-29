@@ -9,5 +9,4 @@ public class HousingManagementSystemApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HousingManagementSystemApplication.class, args);
 	}
-
 }
