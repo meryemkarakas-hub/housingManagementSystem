@@ -2,6 +2,7 @@ package managementSystems.housingManagementSystem.application.controller.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import managementSystems.housingManagementSystem.application.dto.user.ActivationDTO;
 import managementSystems.housingManagementSystem.application.dto.user.SignUpDTO;
 import managementSystems.housingManagementSystem.application.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -23,4 +24,11 @@ public class UserController {
     ResponseEntity<?> signUp(@Valid @RequestBody SignUpDTO signUpDTO) {
         return new ResponseEntity<>(userService.signUp(signUpDTO), HttpStatus.OK);
     }
+
+    @PostMapping("/activation")
+    ResponseEntity<?> activation(@Valid @RequestBody ActivationDTO activationDTO) {
+        return new ResponseEntity<>(userService.activation(activationDTO), HttpStatus.OK);
+    }
+
+
 }

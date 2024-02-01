@@ -44,4 +44,7 @@ public class UserRegistration {
 
     @Column(name = "user_role")
     private String userRole;
+
+    @OneToOne(mappedBy = "userRegistration", cascade = CascadeType.ALL)
+    private UserActivation userActivation;
 }
