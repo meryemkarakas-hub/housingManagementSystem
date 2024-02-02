@@ -6,6 +6,7 @@ import managementSystems.housingManagementSystem.application.core.helper.Activat
 import managementSystems.housingManagementSystem.application.core.service.MailSenderService;
 import managementSystems.housingManagementSystem.application.core.validator.Validator;
 import managementSystems.housingManagementSystem.application.dto.user.ActivationDTO;
+import managementSystems.housingManagementSystem.application.dto.user.LoginDTO;
 import managementSystems.housingManagementSystem.application.dto.user.SignUpDTO;
 import managementSystems.housingManagementSystem.application.entity.user.UserActivation;
 import managementSystems.housingManagementSystem.application.entity.user.UserRegistration;
@@ -15,6 +16,8 @@ import managementSystems.housingManagementSystem.application.repository.user.Use
 import managementSystems.housingManagementSystem.application.repository.user.UserRepository;
 import managementSystems.housingManagementSystem.application.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -42,12 +45,20 @@ public class UserServiceImpl implements UserService {
 
     private final UserActivationMapper userActivationMapper;
 
-    //private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
     public GeneralMessageDTO signUp(SignUpDTO signUpDTO) {
         Validator validator = new Validator();
+        validateLoginDTO(validator, signUpDTO);
+        if (!validator.isValid()) {
+            return new GeneralMessageDTO(0, validator.getErrorMessage());
+        }
+        return checkIfUserExists(signUpDTO);
+    }
+
+    private void validateLoginDTO(Validator validator, SignUpDTO signUpDTO) {
         validator.validateNotNullOrEmpty(signUpDTO.getUserRole(), "Kullanıcı Rolü");
         validator.validateNotNullOrEmpty(signUpDTO.getIdentityNumber(), "TC Kimlik Numarası");
         validator.validateNotNullOrEmpty(signUpDTO.getName(), "Ad");
@@ -58,11 +69,6 @@ public class UserServiceImpl implements UserService {
         validator.validateDateOfBirthNotUnderAge(signUpDTO.getDateOfBirth(), 18, "Doğum Tarihi");
         validator.validateNotNullOrEmpty(signUpDTO.getGender(), "Cinsiyet");
         validator.validateNotNull(signUpDTO.getKvkk(), "KVKK Aydınlatma Metni'ni okudum.");
-
-        if (!validator.isValid()) {
-            return new GeneralMessageDTO(0, validator.getErrorMessage());
-        }
-        return checkIfUserExists(signUpDTO);
     }
 
     private GeneralMessageDTO checkIfUserExists(SignUpDTO signUpDTO) {
@@ -92,28 +98,75 @@ public class UserServiceImpl implements UserService {
         return new GeneralMessageDTO(1, "Belirtmiş olduğunuz e-posta adresine aktivasyon linki gönderilmiştir. Linke tıklayarak aktivasyon işlemini gerçekleştirip kayıt işlemini tamamlayınız.");
     }
 
-    @Override
     public GeneralMessageDTO activation(ActivationDTO activationDTO) {
-        Optional<UserRegistration> userRegistrationFindByIdentityNumberOptional = userRepository.findByIdentityNumber(activationDTO.getIdentityNumber());
-        Optional<UserActivation> userActivationfindByActivationCodeOptional = userActivationRepository.findByActivationCode(activationDTO.getActivationCode());
-        if (userRegistrationFindByIdentityNumberOptional.isPresent()) {
-            if (userActivationfindByActivationCodeOptional.isPresent() && !userActivationfindByActivationCodeOptional.get().getActivationStatus()) {
-                if (activationDTO.getPassword().equals(activationDTO.getRePassword())) {
-                    UserActivation userActivation = userActivationfindByActivationCodeOptional.get(); // Retrieve the existing record
-                    //String hashedPassword = passwordEncoder.encode(activationDTO.getPassword());
-                    userActivation.setPassword(activationDTO.getPassword());
-                    userActivation.setActivationStatus(true);
-                    userActivation.setRegistrationTime(LocalDateTime.now());
-                    userActivationRepository.save(userActivation);
-                    return new GeneralMessageDTO(1, "Aktivasyon işleminiz başarıyla gerçekleşmiştir. Sistemimize giriş yapabilirsiniz.");
-                }
-                return new GeneralMessageDTO(0, "Lütfen Şifre ve Şifre Tekrar alanlarına aynı şifre bilgilerini giriniz.");
-            }
-            return new GeneralMessageDTO(0, "Aktivasyon işlemini daha önce gerçekleştirdiğiniz için tekrar aktivasyon işlemi gerçekleştiremezsiniz");
-
+        Validator validator = new Validator();
+        validateActivationDTO(validator, activationDTO);
+        if (!validator.isValid()) {
+            return new GeneralMessageDTO(0, validator.getErrorMessage());
         }
-        return new GeneralMessageDTO(0, "Lütfen kaydolurken girmiş olduğunuz TC kimlik numarası ile aktivasyon işlemini gerçekleştiriniz.");
+        Optional<UserActivation> userActivationOptional = userActivationRepository.findByActivationCode(activationDTO.getActivationCode());
+
+        if (userActivationOptional.isEmpty()) {
+            return new GeneralMessageDTO(0, "Geçersiz aktivasyon kodu.");
+        }
+
+        UserActivation userActivation = userActivationOptional.get();
+
+        if (userActivation.getActivationStatus()) {
+            return new GeneralMessageDTO(0, "Aktivasyon işlemini daha önce gerçekleştirdiğiniz için tekrar aktivasyon işlemi gerçekleştiremezsiniz..");
+        }
+
+        Optional<UserRegistration> userRegistrationOptional = userRepository.findByIdentityNumber(activationDTO.getIdentityNumber());
+
+        if (userRegistrationOptional.isEmpty()) {
+            return new GeneralMessageDTO(0, "Geçersiz TC kimlik numarası. Lütfen kaydolurken girmiş olduğunuz TC kimlik numarası ile aktivasyon işlemini gerçekleştiriniz.");
+        }
+
+        if (!activationDTO.getPassword().equals(activationDTO.getRePassword())) {
+            return new GeneralMessageDTO(0, "Lütfen Şifre ve Şifre Tekrar alanlarına aynı şifre bilgilerini giriniz.");
+        }
+
+        String hashedPassword = passwordEncoder.encode(activationDTO.getPassword());
+        userActivation.setPassword(hashedPassword);
+        userActivation.setActivationStatus(true);
+        userActivation.setRegistrationTime(LocalDateTime.now());
+        userActivationRepository.save(userActivation);
+
+        return new GeneralMessageDTO(1, "Aktivasyon işleminiz başarıyla gerçekleşmiştir. Sistemimize giriş yapabilirsiniz.");
     }
+
+    private void validateActivationDTO(Validator validator, ActivationDTO activationDTO) {
+        validator.validateNotNullOrEmpty(activationDTO.getIdentityNumber(), "TC Kimlik Numarası");
+        validator.validateNotNullOrEmpty(activationDTO.getPassword(), "Şifre");
+        validator.validateNotNullOrEmpty(activationDTO.getRePassword(), "Şifre Tekrar");
+        validator.validateNotNullOrEmpty(activationDTO.getActivationCode(), "Aktivasyon Kodu");
+    }
+
+    @Override
+    public GeneralMessageDTO login(LoginDTO loginDTO) {
+        Optional<UserRegistration> userRegistrationFindByIdentityNumberOptional = userRepository.findByIdentityNumber(loginDTO.getIdentityNumber());
+        if (userRegistrationFindByIdentityNumberOptional.isPresent()) {
+            if (userRegistrationFindByIdentityNumberOptional.get().getUserActivation().getActivationStatus()) {
+                if (isPasswordCorrect(loginDTO.getPassword(), userRegistrationFindByIdentityNumberOptional.get().getUserActivation().getPassword())) {
+                    userRegistrationFindByIdentityNumberOptional.get().getUserActivation().setLastLoginTime(LocalDateTime.now());
+                    userRepository.save(userRegistrationFindByIdentityNumberOptional.get());
+                    return new GeneralMessageDTO(1, "İşleminiz başarıyla gerçekleşmiştir. Sistemimize yönlendiriliyorsunuz.");
+                }
+                return new GeneralMessageDTO(0, "Lütfen kayıt olurken oluşturmuş olduğunuz şifre ile giriş yapınız");
+            }
+            return new GeneralMessageDTO(0, "Lütfen aktivasyon işlemini tamamladıktan sonra giriş yapınız.");
+        }
+        return new GeneralMessageDTO(0, "Giriş yapmak istediğiniz TC kimlik numarası ile daha önce kayıt işlemi gerçekleşmemiştir.");
+    }
+
+
+    private boolean isPasswordCorrect(String enteredPassword, String hashedPasswordFromDB) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.matches(enteredPassword, hashedPasswordFromDB);
+    }
+
+
 }
+
 
 

@@ -33,4 +33,9 @@ public class UserActivation {
 
     @Column(name = "registration_time")
     private LocalDateTime registrationTime;
+
+    @Column(name = "last_login_time")
+    private LocalDateTime lastLoginTime;
+
+
 }
