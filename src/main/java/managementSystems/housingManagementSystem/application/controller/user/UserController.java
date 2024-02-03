@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import managementSystems.housingManagementSystem.application.dto.user.ActivationDTO;
 import managementSystems.housingManagementSystem.application.dto.user.LoginDTO;
+import managementSystems.housingManagementSystem.application.dto.user.ResetPasswordDTO;
 import managementSystems.housingManagementSystem.application.dto.user.SignUpDTO;
 import managementSystems.housingManagementSystem.application.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -35,4 +36,11 @@ public class UserController {
     ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO) {
         return new ResponseEntity<>(userService.login(loginDTO), HttpStatus.OK);
     }
+
+    @PostMapping("/reset-password")
+    ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
+        return new ResponseEntity<>(userService.resetPassword(resetPasswordDTO), HttpStatus.OK);
+    }
+
+
 }

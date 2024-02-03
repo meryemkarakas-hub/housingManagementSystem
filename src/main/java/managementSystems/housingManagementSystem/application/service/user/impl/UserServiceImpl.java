@@ -7,6 +7,7 @@ import managementSystems.housingManagementSystem.application.core.service.MailSe
 import managementSystems.housingManagementSystem.application.core.validator.Validator;
 import managementSystems.housingManagementSystem.application.dto.user.ActivationDTO;
 import managementSystems.housingManagementSystem.application.dto.user.LoginDTO;
+import managementSystems.housingManagementSystem.application.dto.user.ResetPasswordDTO;
 import managementSystems.housingManagementSystem.application.dto.user.SignUpDTO;
 import managementSystems.housingManagementSystem.application.entity.user.UserActivation;
 import managementSystems.housingManagementSystem.application.entity.user.UserRegistration;
@@ -88,7 +89,7 @@ public class UserServiceImpl implements UserService {
         UserRegistration userRegistration = userMapper.toEntity(signUpDTO);
         String activationCode = ActivationCodeHelper.generateActivationCode();
         String activationUrlContent = activationUrl + activationCode;
-        //mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
+        mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
         UserActivation userActivation = new UserActivation();
         userActivation.setActivationCode(activationCode);
         userActivation.setActivationStatus(false);
@@ -159,13 +160,38 @@ public class UserServiceImpl implements UserService {
         return new GeneralMessageDTO(0, "Giriş yapmak istediğiniz TC kimlik numarası ile daha önce kayıt işlemi gerçekleşmemiştir.");
     }
 
-
     private boolean isPasswordCorrect(String enteredPassword, String hashedPasswordFromDB) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return encoder.matches(enteredPassword, hashedPasswordFromDB);
     }
 
+    @Override
+    public GeneralMessageDTO resetPassword(ResetPasswordDTO resetPasswordDTO) {
+        Optional<UserRegistration> userFindByIdentityNumberRegistrationOptional = userRepository.findByIdentityNumber(resetPasswordDTO.getIdentityNumber());
+        Optional<UserRegistration> userRegistrationFindByEmailAddressOptional = userRepository.findByEmailAddress(resetPasswordDTO.getEmailAddress());
+        if (userFindByIdentityNumberRegistrationOptional.isPresent()) {
+            if (userFindByIdentityNumberRegistrationOptional.get().getUserActivation().getActivationStatus()) {
+                if (userRegistrationFindByEmailAddressOptional.isPresent()) {
+                    String activationCode = ActivationCodeHelper.generateActivationCode();
+                    String activationUrlContent = activationUrl + activationCode;
+                    mailSenderService.sendMail(resetPasswordDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
+                    UserActivation userActivation = new UserActivation();
+                    userActivation.setActivationCode(activationCode);
+                    userActivation.setActivationStatus(false);
+                    userFindByIdentityNumberRegistrationOptional.get().setUserActivation(userActivation);
+                    userActivation.setUserRegistration(userFindByIdentityNumberRegistrationOptional.get());
+                    userRepository.save(userFindByIdentityNumberRegistrationOptional.get());
 
+                    userFindByIdentityNumberRegistrationOptional.get().getUserActivation().setActivationStatus(false);
+                    return new GeneralMessageDTO(1, "E-posta adresinize şifrenizi yenileyebilmeniz için ilgili bağlantı iletilmiştir.Linke tıklayarak şifrenizi yenileyebilirsiniz.");
+                }
+                return new GeneralMessageDTO(0, "Sistemde bu e-posta adresine sahip kullanıcı bulunmadığından şifrenizi yenileyemezsiniz.");
+            }
+            return new GeneralMessageDTO(0, "Daha önce aktivasyon işlemi gerçekleştirmediğiniz için şifrenizi yenileyemezsiniz.");
+
+        }
+        return new GeneralMessageDTO(0, "Sistemde bu TC kimlik numarasına sahip kullanıcı bulunmadığından şifrenizi yenileyemezsiniz.");
+    }
 }
 
 

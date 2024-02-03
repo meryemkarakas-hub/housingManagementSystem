@@ -3,6 +3,7 @@ package managementSystems.housingManagementSystem.application.service;
 import managementSystems.housingManagementSystem.application.core.dto.GeneralMessageDTO;
 import managementSystems.housingManagementSystem.application.dto.user.ActivationDTO;
 import managementSystems.housingManagementSystem.application.dto.user.LoginDTO;
+import managementSystems.housingManagementSystem.application.dto.user.ResetPasswordDTO;
 import managementSystems.housingManagementSystem.application.dto.user.SignUpDTO;
 
 public interface UserService {
@@ -11,4 +12,6 @@ public interface UserService {
     GeneralMessageDTO activation(ActivationDTO activationDTO);
 
     GeneralMessageDTO login(LoginDTO loginDTO);
+
+    GeneralMessageDTO resetPassword(ResetPasswordDTO resetPasswordDTO);
 }
