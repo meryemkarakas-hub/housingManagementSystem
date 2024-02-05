@@ -145,6 +145,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GeneralMessageDTO login(LoginDTO loginDTO) {
+        Validator validator = new Validator();
+        validateLoginDTO(validator, loginDTO);
+        if (!validator.isValid()) {
+            return new GeneralMessageDTO(0, validator.getErrorMessage());
+        }
         Optional<UserRegistration> userRegistrationFindByIdentityNumberOptional = userRepository.findByIdentityNumber(loginDTO.getIdentityNumber());
         if (userRegistrationFindByIdentityNumberOptional.isPresent()) {
             if (userRegistrationFindByIdentityNumberOptional.get().getUserActivation().getActivationStatus()) {
@@ -160,6 +165,11 @@ public class UserServiceImpl implements UserService {
         return new GeneralMessageDTO(0, "Giriş yapmak istediğiniz TC kimlik numarası ile daha önce kayıt işlemi gerçekleşmemiştir.");
     }
 
+    private void validateLoginDTO(Validator validator, LoginDTO loginDTO) {
+        validator.validateNotNullOrEmpty(loginDTO.getIdentityNumber(), "TC Kimlik Numarası");
+        validator.validateNotNullOrEmpty(loginDTO.getPassword(), "Şifre");
+    }
+
     private boolean isPasswordCorrect(String enteredPassword, String hashedPasswordFromDB) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return encoder.matches(enteredPassword, hashedPasswordFromDB);
@@ -167,6 +177,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GeneralMessageDTO resetPassword(ResetPasswordDTO resetPasswordDTO) {
+        Validator validator = new Validator();
+        validateResetPasswordDTO(validator, resetPasswordDTO);
+        if (!validator.isValid()) {
+            return new GeneralMessageDTO(0, validator.getErrorMessage());
+        }
         Optional<UserRegistration> userFindByIdentityNumberRegistrationOptional = userRepository.findByIdentityNumber(resetPasswordDTO.getIdentityNumber());
         Optional<UserRegistration> userRegistrationFindByEmailAddressOptional = userRepository.findByEmailAddress(resetPasswordDTO.getEmailAddress());
         if (userFindByIdentityNumberRegistrationOptional.isPresent()) {
@@ -175,14 +190,18 @@ public class UserServiceImpl implements UserService {
                     String activationCode = ActivationCodeHelper.generateActivationCode();
                     String activationUrlContent = activationUrl + activationCode;
                     //mailSenderService.sendMail(resetPasswordDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
-                    UserActivation userActivation = new UserActivation();
-                    userActivation.setActivationCode(activationCode);
-                    userActivation.setActivationStatus(false);
-                    userFindByIdentityNumberRegistrationOptional.get().setUserActivation(userActivation);
-                    userActivation.setUserRegistration(userFindByIdentityNumberRegistrationOptional.get());
+                    UserActivation existingUserActivation = userFindByIdentityNumberRegistrationOptional.get().getUserActivation();
+                    if (existingUserActivation == null) {
+                        existingUserActivation = new UserActivation();
+                        userFindByIdentityNumberRegistrationOptional.get().setUserActivation(existingUserActivation);
+                        existingUserActivation.setUserRegistration(userFindByIdentityNumberRegistrationOptional.get());
+                    }
+
+                    existingUserActivation.setActivationCode(activationCode);
+                    existingUserActivation.setActivationStatus(false);
+
                     userRepository.save(userFindByIdentityNumberRegistrationOptional.get());
 
-                    userFindByIdentityNumberRegistrationOptional.get().getUserActivation().setActivationStatus(false);
                     return new GeneralMessageDTO(1, "E-posta adresinize şifrenizi yenileyebilmeniz için ilgili bağlantı iletilmiştir.Linke tıklayarak şifrenizi yenileyebilirsiniz.");
                 }
                 return new GeneralMessageDTO(0, "Sistemde bu e-posta adresine sahip kullanıcı bulunmadığından şifrenizi yenileyemezsiniz.");
@@ -191,6 +210,11 @@ public class UserServiceImpl implements UserService {
 
         }
         return new GeneralMessageDTO(0, "Sistemde bu TC kimlik numarasına sahip kullanıcı bulunmadığından şifrenizi yenileyemezsiniz.");
+    }
+
+    private void validateResetPasswordDTO(Validator validator, ResetPasswordDTO resetPasswordDTO) {
+        validator.validateNotNullOrEmpty(resetPasswordDTO.getIdentityNumber(), "TC Kimlik Numarası");
+        validator.validateNotNullOrEmpty(resetPasswordDTO.getEmailAddress(), " E-posta Adresi");
     }
 }
 
