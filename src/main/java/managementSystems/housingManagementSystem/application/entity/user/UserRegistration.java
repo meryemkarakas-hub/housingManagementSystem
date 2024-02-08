@@ -16,7 +16,7 @@ public class UserRegistration {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "identity_number", unique = true)
     private String identityNumber;
@@ -44,6 +44,9 @@ public class UserRegistration {
 
     @Column(name = "user_role")
     private String userRole;
+
+    @Column(name = "password")
+    private String password;
 
     @OneToOne(mappedBy = "userRegistration", cascade = CascadeType.ALL)
     private UserActivation userActivation;

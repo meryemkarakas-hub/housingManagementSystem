@@ -16,7 +16,7 @@ public class UserActivation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @OneToOne
     @JoinColumn(name = "users_registration_id", referencedColumnName = "id")
@@ -27,9 +27,6 @@ public class UserActivation {
 
     @Column(name = "activation_code")
     private String activationCode;
-
-    @Column(name = "password")
-    private String password;
 
     @Column(name = "registration_time")
     private LocalDateTime registrationTime;

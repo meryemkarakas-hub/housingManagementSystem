@@ -14,7 +14,7 @@ public class ReferenceGender {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "gender", unique = true)
     private String gender;

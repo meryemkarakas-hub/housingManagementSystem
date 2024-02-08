@@ -2,6 +2,7 @@ package managementSystems.housingManagementSystem.application.controller.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import managementSystems.housingManagementSystem.application.core.dto.GeneralMessageDTO;
 import managementSystems.housingManagementSystem.application.dto.user.ActivationDTO;
 import managementSystems.housingManagementSystem.application.dto.user.LoginDTO;
 import managementSystems.housingManagementSystem.application.dto.user.ResetPasswordDTO;
@@ -23,24 +24,22 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/sign-up")
-    ResponseEntity<?> signUp(@Valid @RequestBody SignUpDTO signUpDTO) {
+    ResponseEntity<GeneralMessageDTO> signUp(@Valid @RequestBody SignUpDTO signUpDTO) {
         return new ResponseEntity<>(userService.signUp(signUpDTO), HttpStatus.OK);
     }
 
     @PostMapping("/activation")
-    ResponseEntity<?> activation(@Valid @RequestBody ActivationDTO activationDTO) {
+    ResponseEntity<GeneralMessageDTO> activation(@Valid @RequestBody ActivationDTO activationDTO) {
         return new ResponseEntity<>(userService.activation(activationDTO), HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO) {
+    ResponseEntity<GeneralMessageDTO> login(@Valid @RequestBody LoginDTO loginDTO) {
         return new ResponseEntity<>(userService.login(loginDTO), HttpStatus.OK);
     }
 
     @PostMapping("/reset-password")
-    ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
+    ResponseEntity<GeneralMessageDTO> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
         return new ResponseEntity<>(userService.resetPassword(resetPasswordDTO), HttpStatus.OK);
     }
-
-
 }

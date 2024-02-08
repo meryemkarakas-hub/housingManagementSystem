@@ -14,7 +14,7 @@ public class ReferenceUserRoles {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "user_roles", unique = true)
     private String userRoles;

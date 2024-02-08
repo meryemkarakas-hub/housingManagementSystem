@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
         }
 
         String hashedPassword = passwordEncoder.encode(activationDTO.getPassword());
-        userActivation.setPassword(hashedPassword);
+        userRegistrationOptional.get().setPassword(hashedPassword);
         userActivation.setActivationStatus(true);
         userActivation.setRegistrationTime(LocalDateTime.now());
         userActivationRepository.save(userActivation);
@@ -153,7 +153,7 @@ public class UserServiceImpl implements UserService {
         Optional<UserRegistration> userRegistrationFindByIdentityNumberOptional = userRepository.findByIdentityNumber(loginDTO.getIdentityNumber());
         if (userRegistrationFindByIdentityNumberOptional.isPresent()) {
             if (userRegistrationFindByIdentityNumberOptional.get().getUserActivation().getActivationStatus()) {
-                if (isPasswordCorrect(loginDTO.getPassword(), userRegistrationFindByIdentityNumberOptional.get().getUserActivation().getPassword())) {
+                if (isPasswordCorrect(loginDTO.getPassword(), userRegistrationFindByIdentityNumberOptional.get().getPassword())) {
                     userRegistrationFindByIdentityNumberOptional.get().getUserActivation().setLastLoginTime(LocalDateTime.now());
                     userRepository.save(userRegistrationFindByIdentityNumberOptional.get());
                     return new GeneralMessageDTO(1, "İşleminiz başarıyla gerçekleşmiştir. Sistemimize yönlendiriliyorsunuz.");
