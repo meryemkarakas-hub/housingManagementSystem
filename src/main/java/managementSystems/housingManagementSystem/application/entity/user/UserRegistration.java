@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "users_registration")
@@ -42,12 +43,12 @@ public class UserRegistration {
     @Column(name = "kvkk")
     private Boolean kvkk;
 
-    @Column(name = "user_role")
-    private String userRole;
-
     @Column(name = "password")
     private String password;
 
     @OneToOne(mappedBy = "userRegistration", cascade = CascadeType.ALL)
     private UserActivation userActivation;
+
+    @OneToMany(mappedBy = "userRegistration", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<UserRoles> userRolesList;
 }

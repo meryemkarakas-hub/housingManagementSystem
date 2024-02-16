@@ -18,5 +18,5 @@ public class SignUpDTO {
     private LocalDate dateOfBirth;
     private String gender;
     private Boolean kvkk;
-    private String userRole;
+    private Long userRole;
 }

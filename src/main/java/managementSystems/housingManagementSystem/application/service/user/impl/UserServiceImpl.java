@@ -9,8 +9,10 @@ import managementSystems.housingManagementSystem.application.dto.user.Activation
 import managementSystems.housingManagementSystem.application.dto.user.LoginDTO;
 import managementSystems.housingManagementSystem.application.dto.user.ResetPasswordDTO;
 import managementSystems.housingManagementSystem.application.dto.user.SignUpDTO;
+import managementSystems.housingManagementSystem.application.entity.reference.ReferenceUserRoles;
 import managementSystems.housingManagementSystem.application.entity.user.UserActivation;
 import managementSystems.housingManagementSystem.application.entity.user.UserRegistration;
+import managementSystems.housingManagementSystem.application.entity.user.UserRoles;
 import managementSystems.housingManagementSystem.application.mapper.user.UserActivationMapper;
 import managementSystems.housingManagementSystem.application.mapper.user.UserMapper;
 import managementSystems.housingManagementSystem.application.repository.user.UserActivationRepository;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateLoginDTO(Validator validator, SignUpDTO signUpDTO) {
-        validator.validateNotNullOrEmpty(signUpDTO.getUserRole(), "Kullanıcı Rolü");
+        validator.validateNotNull(signUpDTO.getUserRole(), "Kullanıcı Rolü");
         validator.validateNotNullOrEmpty(signUpDTO.getIdentityNumber(), "TC Kimlik Numarası");
         validator.validateNotNullOrEmpty(signUpDTO.getName(), "Ad");
         validator.validateNotNullOrEmpty(signUpDTO.getSurname(), "Soyad");
@@ -95,6 +98,14 @@ public class UserServiceImpl implements UserService {
         userActivation.setActivationStatus(false);
         userRegistration.setUserActivation(userActivation);
         userActivation.setUserRegistration(userRegistration);
+        UserRoles userRoles = new UserRoles();
+        ReferenceUserRoles referenceUserRoles=new ReferenceUserRoles();
+        referenceUserRoles.setId(signUpDTO.getUserRole());
+        userRoles.setReferenceUserRoles(referenceUserRoles);
+        userRoles.setUserRegistration(userRegistration);
+        List<UserRoles> userRolesList = new ArrayList<>();
+        userRolesList.add(userRoles);
+        userRegistration.setUserRolesList(userRolesList);
         userRepository.save(userRegistration);
         return new GeneralMessageDTO(1, "Belirtmiş olduğunuz e-posta adresine aktivasyon linki gönderilmiştir. Linke tıklayarak aktivasyon işlemini gerçekleştirip kayıt işlemini tamamlayınız.");
     }
