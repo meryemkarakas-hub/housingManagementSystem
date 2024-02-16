@@ -16,7 +16,7 @@ import managementSystems.housingManagementSystem.application.entity.user.UserRol
 import managementSystems.housingManagementSystem.application.mapper.user.UserActivationMapper;
 import managementSystems.housingManagementSystem.application.mapper.user.UserMapper;
 import managementSystems.housingManagementSystem.application.repository.user.UserActivationRepository;
-import managementSystems.housingManagementSystem.application.repository.user.UserRepository;
+import managementSystems.housingManagementSystem.application.repository.user.UserRegistrationRepository;
 import managementSystems.housingManagementSystem.application.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+    private final UserRegistrationRepository userRegistrationRepository;
 
     private final UserMapper userMapper;
 
@@ -77,13 +77,13 @@ public class UserServiceImpl implements UserService {
 
     private GeneralMessageDTO checkIfUserExists(SignUpDTO signUpDTO) {
         List<Supplier<Optional<UserRegistration>>> checks = Arrays.asList(
-                () -> userRepository.findByIdentityNumber(signUpDTO.getIdentityNumber()),
-                () -> userRepository.findByEmailAddress(signUpDTO.getEmailAddress()),
-                () -> userRepository.findByMobileNumber(signUpDTO.getMobileNumber()),
-                () -> userRepository.findByIdentityNumberAndEmailAddressAndMobileNumber(signUpDTO.getIdentityNumber(), signUpDTO.getEmailAddress(), signUpDTO.getMobileNumber()),
-                () -> userRepository.findByIdentityNumberAndEmailAddress(signUpDTO.getIdentityNumber(), signUpDTO.getEmailAddress()),
-                () -> userRepository.findByIdentityNumberAndMobileNumber(signUpDTO.getIdentityNumber(), signUpDTO.getMobileNumber()),
-                () -> userRepository.findByEmailAddressAndMobileNumber(signUpDTO.getEmailAddress(), signUpDTO.getMobileNumber())
+                () -> userRegistrationRepository.findByIdentityNumber(signUpDTO.getIdentityNumber()),
+                () -> userRegistrationRepository.findByEmailAddress(signUpDTO.getEmailAddress()),
+                () -> userRegistrationRepository.findByMobileNumber(signUpDTO.getMobileNumber()),
+                () -> userRegistrationRepository.findByIdentityNumberAndEmailAddressAndMobileNumber(signUpDTO.getIdentityNumber(), signUpDTO.getEmailAddress(), signUpDTO.getMobileNumber()),
+                () -> userRegistrationRepository.findByIdentityNumberAndEmailAddress(signUpDTO.getIdentityNumber(), signUpDTO.getEmailAddress()),
+                () -> userRegistrationRepository.findByIdentityNumberAndMobileNumber(signUpDTO.getIdentityNumber(), signUpDTO.getMobileNumber()),
+                () -> userRegistrationRepository.findByEmailAddressAndMobileNumber(signUpDTO.getEmailAddress(), signUpDTO.getMobileNumber())
         );
 
         if (checks.stream().anyMatch(supplier -> supplier.get().isPresent())) {
@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
         List<UserRoles> userRolesList = new ArrayList<>();
         userRolesList.add(userRoles);
         userRegistration.setUserRolesList(userRolesList);
-        userRepository.save(userRegistration);
+        userRegistrationRepository.save(userRegistration);
         return new GeneralMessageDTO(1, "Belirtmiş olduğunuz e-posta adresine aktivasyon linki gönderilmiştir. Linke tıklayarak aktivasyon işlemini gerçekleştirip kayıt işlemini tamamlayınız.");
     }
 
@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
             return new GeneralMessageDTO(0, "Aktivasyon işlemini daha önce gerçekleştirdiğiniz için tekrar aktivasyon işlemi gerçekleştiremezsiniz..");
         }
 
-        Optional<UserRegistration> userRegistrationOptional = userRepository.findByIdentityNumber(activationDTO.getIdentityNumber());
+        Optional<UserRegistration> userRegistrationOptional = userRegistrationRepository.findByIdentityNumber(activationDTO.getIdentityNumber());
 
         if (userRegistrationOptional.isEmpty()) {
             return new GeneralMessageDTO(0, "Geçersiz TC kimlik numarası. Lütfen kaydolurken girmiş olduğunuz TC kimlik numarası ile aktivasyon işlemini gerçekleştiriniz.");
@@ -161,12 +161,12 @@ public class UserServiceImpl implements UserService {
         if (!validator.isValid()) {
             return new GeneralMessageDTO(0, validator.getErrorMessage());
         }
-        Optional<UserRegistration> userRegistrationFindByIdentityNumberOptional = userRepository.findByIdentityNumber(loginDTO.getIdentityNumber());
+        Optional<UserRegistration> userRegistrationFindByIdentityNumberOptional = userRegistrationRepository.findByIdentityNumber(loginDTO.getIdentityNumber());
         if (userRegistrationFindByIdentityNumberOptional.isPresent()) {
             if (userRegistrationFindByIdentityNumberOptional.get().getUserActivation().getActivationStatus()) {
                 if (isPasswordCorrect(loginDTO.getPassword(), userRegistrationFindByIdentityNumberOptional.get().getPassword())) {
                     userRegistrationFindByIdentityNumberOptional.get().getUserActivation().setLastLoginTime(LocalDateTime.now());
-                    userRepository.save(userRegistrationFindByIdentityNumberOptional.get());
+                    userRegistrationRepository.save(userRegistrationFindByIdentityNumberOptional.get());
                     return new GeneralMessageDTO(1, "İşleminiz başarıyla gerçekleşmiştir. Sistemimize yönlendiriliyorsunuz.");
                 }
                 return new GeneralMessageDTO(0, "Lütfen kayıt olurken oluşturmuş olduğunuz şifre ile giriş yapınız");
@@ -193,8 +193,8 @@ public class UserServiceImpl implements UserService {
         if (!validator.isValid()) {
             return new GeneralMessageDTO(0, validator.getErrorMessage());
         }
-        Optional<UserRegistration> userFindByIdentityNumberRegistrationOptional = userRepository.findByIdentityNumber(resetPasswordDTO.getIdentityNumber());
-        Optional<UserRegistration> userRegistrationFindByEmailAddressOptional = userRepository.findByEmailAddress(resetPasswordDTO.getEmailAddress());
+        Optional<UserRegistration> userFindByIdentityNumberRegistrationOptional = userRegistrationRepository.findByIdentityNumber(resetPasswordDTO.getIdentityNumber());
+        Optional<UserRegistration> userRegistrationFindByEmailAddressOptional = userRegistrationRepository.findByEmailAddress(resetPasswordDTO.getEmailAddress());
         if (userFindByIdentityNumberRegistrationOptional.isPresent()) {
             if (userFindByIdentityNumberRegistrationOptional.get().getUserActivation().getActivationStatus()) {
                 if (userRegistrationFindByEmailAddressOptional.isPresent()) {
@@ -211,7 +211,7 @@ public class UserServiceImpl implements UserService {
                     existingUserActivation.setActivationCode(activationCode);
                     existingUserActivation.setActivationStatus(false);
 
-                    userRepository.save(userFindByIdentityNumberRegistrationOptional.get());
+                    userRegistrationRepository.save(userFindByIdentityNumberRegistrationOptional.get());
 
                     return new GeneralMessageDTO(1, "E-posta adresinize şifrenizi yenileyebilmeniz için ilgili bağlantı iletilmiştir.Linke tıklayarak şifrenizi yenileyebilirsiniz.");
                 }
