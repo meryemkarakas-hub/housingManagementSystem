@@ -87,12 +87,12 @@ public class UserServiceImpl implements UserService {
         );
 
         if (checks.stream().anyMatch(supplier -> supplier.get().isPresent())) {
-            return new GeneralMessageDTO(0, "Kaydolmak istediğiniz bilgiler ile daha önce kayıt işlemi gerçekleşmiştir.Aynı TC kimlik numarası, e-posta adresi ve cep telefonu bilgisi ile kaydolamazsınız.");
+            return new GeneralMessageDTO(0, "Kaydolmak istediğiniz bilgiler ile daha önce kayıt işlemi gerçekleşmiştir. Aynı TC kimlik numarası, e-posta adresi ve cep telefonu bilgisi ile kaydolamazsınız.");
         }
         UserRegistration userRegistration = userMapper.toEntity(signUpDTO);
         String activationCode = ActivationCodeHelper.generateActivationCode();
         String activationUrlContent = activationUrl + activationCode;
-        //mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
+        mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
         UserActivation userActivation = new UserActivation();
         userActivation.setActivationCode(activationCode);
         userActivation.setActivationStatus(false);
@@ -200,7 +200,7 @@ public class UserServiceImpl implements UserService {
                 if (userRegistrationFindByEmailAddressOptional.isPresent()) {
                     String activationCode = ActivationCodeHelper.generateActivationCode();
                     String activationUrlContent = activationUrl + activationCode;
-                    //mailSenderService.sendMail(resetPasswordDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
+                    mailSenderService.sendMail(resetPasswordDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
                     UserActivation existingUserActivation = userFindByIdentityNumberRegistrationOptional.get().getUserActivation();
                     if (existingUserActivation == null) {
                         existingUserActivation = new UserActivation();
@@ -213,7 +213,7 @@ public class UserServiceImpl implements UserService {
 
                     userRegistrationRepository.save(userFindByIdentityNumberRegistrationOptional.get());
 
-                    return new GeneralMessageDTO(1, "E-posta adresinize şifrenizi yenileyebilmeniz için ilgili bağlantı iletilmiştir.Linke tıklayarak şifrenizi yenileyebilirsiniz.");
+                    return new GeneralMessageDTO(1, "E-posta adresinize şifrenizi yenileyebilmeniz için ilgili bağlantı iletilmiştir. Linke tıklayarak şifrenizi yenileyebilirsiniz.");
                 }
                 return new GeneralMessageDTO(0, "Sistemde bu e-posta adresine sahip kullanıcı bulunmadığından şifrenizi yenileyemezsiniz.");
             }
