@@ -91,8 +91,8 @@ public class UserServiceImpl implements UserService {
         }
         UserRegistration userRegistration = userMapper.toEntity(signUpDTO);
         String activationCode = ActivationCodeHelper.generateActivationCode();
-        String activationUrlContent = activationUrl + activationCode;
-        mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
+        //String activationUrlContent = activationUrl + activationCode;
+        //mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
         UserActivation userActivation = new UserActivation();
         userActivation.setActivationCode(activationCode);
         userActivation.setActivationStatus(false);
@@ -199,8 +199,8 @@ public class UserServiceImpl implements UserService {
             if (userFindByIdentityNumberRegistrationOptional.get().getUserActivation().getActivationStatus()) {
                 if (userRegistrationFindByEmailAddressOptional.isPresent()) {
                     String activationCode = ActivationCodeHelper.generateActivationCode();
-                    String activationUrlContent = activationUrl + activationCode;
-                    mailSenderService.sendMail(resetPasswordDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
+                    //String activationUrlContent = activationUrl + activationCode;
+                    //mailSenderService.sendMail(resetPasswordDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
                     UserActivation existingUserActivation = userFindByIdentityNumberRegistrationOptional.get().getUserActivation();
                     if (existingUserActivation == null) {
                         existingUserActivation = new UserActivation();
