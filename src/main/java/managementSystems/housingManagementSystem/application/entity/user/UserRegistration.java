@@ -51,4 +51,10 @@ public class UserRegistration {
 
     @OneToMany(mappedBy = "userRegistration", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<UserRoles> userRolesList;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_registration_residential_type",
+            joinColumns = @JoinColumn(name = "user_registration_id"),
+            inverseJoinColumns = @JoinColumn(name = "residential_type_id"))
+    private List<ResidentialType> residentialTypes;
 }

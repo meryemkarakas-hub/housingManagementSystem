@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -18,10 +20,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String identityNumber) throws UsernameNotFoundException {
-        UserRegistration userRegistration = userRegistrationRepository.findByIdentityNumber(identityNumber)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with identityNumber: " + identityNumber));
-
-        return UserDetailsImpl.build(userRegistration);
+        Optional<UserRegistration> userRegistrationOptional = userRegistrationRepository.findByIdentityNumber(identityNumber);
+        if (userRegistrationOptional.isPresent()) {
+            UserRegistration userRegistration = userRegistrationOptional.get();
+            if (userRegistration.getUserActivation() != null && userRegistration.getUserActivation().getActivationStatus()) {
+                return UserDetailsImpl.build(userRegistration);
+            } else {
+                throw new UsernameNotFoundException("User with identityNumber: " + identityNumber + " is not activated.");
+            }
+        } else {
+            throw new UsernameNotFoundException("User Not Found with identityNumber: " + identityNumber);
+        }
     }
 
 }
