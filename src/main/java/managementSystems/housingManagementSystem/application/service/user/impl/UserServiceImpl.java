@@ -3,16 +3,21 @@ package managementSystems.housingManagementSystem.application.service.user.impl;
 import lombok.RequiredArgsConstructor;
 import managementSystems.housingManagementSystem.application.core.dto.GeneralMessageDTO;
 import managementSystems.housingManagementSystem.application.core.helper.ActivationCodeHelper;
+import managementSystems.housingManagementSystem.application.core.oauth.dto.SessionDTO;
+import managementSystems.housingManagementSystem.application.core.oauth.service.SessionService;
 import managementSystems.housingManagementSystem.application.core.service.MailSenderService;
 import managementSystems.housingManagementSystem.application.core.validator.Validator;
+import managementSystems.housingManagementSystem.application.dto.residental.ResidentialTypesDTO;
 import managementSystems.housingManagementSystem.application.dto.user.ActivationDTO;
 import managementSystems.housingManagementSystem.application.dto.user.LoginDTO;
 import managementSystems.housingManagementSystem.application.dto.user.ResetPasswordDTO;
 import managementSystems.housingManagementSystem.application.dto.user.SignUpDTO;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceUserRoles;
+import managementSystems.housingManagementSystem.application.entity.user.ResidentialType;
 import managementSystems.housingManagementSystem.application.entity.user.UserActivation;
 import managementSystems.housingManagementSystem.application.entity.user.UserRegistration;
 import managementSystems.housingManagementSystem.application.entity.user.UserRoles;
+import managementSystems.housingManagementSystem.application.mapper.residental.ResidentialTypesMapper;
 import managementSystems.housingManagementSystem.application.mapper.user.UserActivationMapper;
 import managementSystems.housingManagementSystem.application.mapper.user.UserMapper;
 import managementSystems.housingManagementSystem.application.repository.user.UserActivationRepository;
@@ -50,6 +55,10 @@ public class UserServiceImpl implements UserService {
     private final UserActivationMapper userActivationMapper;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final SessionService sessionService;
+
+    private final ResidentialTypesMapper residentialTypesMapper;
 
 
     @Override
@@ -99,7 +108,7 @@ public class UserServiceImpl implements UserService {
         userRegistration.setUserActivation(userActivation);
         userActivation.setUserRegistration(userRegistration);
         UserRoles userRoles = new UserRoles();
-        ReferenceUserRoles referenceUserRoles=new ReferenceUserRoles();
+        ReferenceUserRoles referenceUserRoles = new ReferenceUserRoles();
         referenceUserRoles.setId(signUpDTO.getUserRole());
         userRoles.setReferenceUserRoles(referenceUserRoles);
         userRoles.setUserRegistration(userRegistration);
@@ -154,6 +163,7 @@ public class UserServiceImpl implements UserService {
         validator.validateNotNullOrEmpty(activationDTO.getActivationCode(), "Aktivasyon Kodu");
     }
 
+    @Deprecated
     @Override
     public GeneralMessageDTO login(LoginDTO loginDTO) {
         Validator validator = new Validator();
@@ -223,11 +233,24 @@ public class UserServiceImpl implements UserService {
         return new GeneralMessageDTO(0, "Sistemde bu TC kimlik numarasına sahip kullanıcı bulunmadığından şifrenizi yenileyemezsiniz.");
     }
 
+
     private void validateResetPasswordDTO(Validator validator, ResetPasswordDTO resetPasswordDTO) {
         validator.validateNotNullOrEmpty(resetPasswordDTO.getIdentityNumber(), "TC Kimlik Numarası");
         validator.validateNotNullOrEmpty(resetPasswordDTO.getEmailAddress(), " E-posta Adresi");
     }
+
+    @Override
+    public List<ResidentialTypesDTO> getResidentialType() {
+        SessionDTO sessionDTO = sessionService.getSession();
+        Optional<UserRegistration> userFindByIdentityNumberRegistrationOptional = userRegistrationRepository.findByIdentityNumber(sessionDTO.getIdentityNumber());
+        if (userFindByIdentityNumberRegistrationOptional.isPresent()) {
+            List<ResidentialType> residentialTypeList = userFindByIdentityNumberRegistrationOptional.get().getResidentialTypes();
+            return residentialTypesMapper.toDto(residentialTypeList);
+        }
+        return null;
+    }
 }
+
 
 
 
