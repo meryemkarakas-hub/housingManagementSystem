@@ -1,4 +1,4 @@
-package managementSystems.housingManagementSystem.application.entity.user;
+package managementSystems.housingManagementSystem.application.entity.residential;
 
 import jakarta.persistence.*;
 import lombok.Getter;

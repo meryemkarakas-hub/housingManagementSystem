@@ -1,7 +1,7 @@
-package managementSystems.housingManagementSystem.application.mapper.residental;
+package managementSystems.housingManagementSystem.application.mapper.residential;
 
 import managementSystems.housingManagementSystem.application.dto.residental.ResidentialTypesDTO;
-import managementSystems.housingManagementSystem.application.entity.user.ResidentialType;
+import managementSystems.housingManagementSystem.application.entity.residential.ResidentialType;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueCheckStrategy;
 

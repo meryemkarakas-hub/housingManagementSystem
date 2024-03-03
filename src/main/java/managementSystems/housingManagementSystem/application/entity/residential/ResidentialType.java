@@ -1,9 +1,11 @@
-package managementSystems.housingManagementSystem.application.entity.user;
+package managementSystems.housingManagementSystem.application.entity.residential;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import managementSystems.housingManagementSystem.application.entity.reference.ReferenceHousingTypes;
+import managementSystems.housingManagementSystem.application.entity.user.UserRegistration;
 
 import java.util.List;
 
@@ -18,8 +20,9 @@ public class ResidentialType {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "residential_type", unique = true)
-    private String residentialType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reference_housing_types_id", referencedColumnName = "id")
+    private ReferenceHousingTypes referenceHousingTypes;
 
     @ManyToMany(mappedBy = "residentialTypes")
     private List<UserRegistration> userRegistrations;
