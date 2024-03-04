@@ -8,6 +8,10 @@ import lombok.Setter;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceCity;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceCountry;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceHousingTypes;
+import managementSystems.housingManagementSystem.application.entity.user.UserRegistration;
+import managementSystems.housingManagementSystem.application.entity.user.UserRoles;
+
+import java.util.List;
 
 @Entity
 @Table(name = "add_management")
@@ -40,4 +44,17 @@ public class AddManagement {
 
     @Column(name = "number_of_flats")
     private String numberOfFlats;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_registration_add_management",
+            joinColumns = @JoinColumn(name = "add_management_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_registration_id"))
+    private List<UserRegistration> userRegistrationList;
+
+//    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    @JoinTable(name = "user_registration_add_management",
+//            joinColumns = @JoinColumn(name = "add_management_id"),
+//            inverseJoinColumns = @JoinColumn(name = "users_rol_id"))
+//    @OneToMany(mappedBy = "addManagement", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    private List<UserRoles> userRolesList;
 }

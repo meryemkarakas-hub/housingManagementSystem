@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import managementSystems.housingManagementSystem.application.entity.management.AddManagement;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceUserRoles;
 
 @Entity
@@ -24,4 +25,5 @@ public class UserRoles {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reference_user_roles_id",referencedColumnName = "id")
     private ReferenceUserRoles referenceUserRoles;
+
 }

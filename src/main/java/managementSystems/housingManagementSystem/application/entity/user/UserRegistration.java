@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import managementSystems.housingManagementSystem.application.entity.management.AddManagement;
+import managementSystems.housingManagementSystem.application.entity.reference.ReferenceGender;
 import managementSystems.housingManagementSystem.application.entity.residential.ResidentialType;
 
 import java.time.LocalDate;
@@ -38,8 +40,9 @@ public class UserRegistration {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "gender")
-    private String gender;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ref erence_gender_id", referencedColumnName = "id")
+    private ReferenceGender referenceGender;
 
     @Column(name = "kvkk")
     private Boolean kvkk;
@@ -58,4 +61,7 @@ public class UserRegistration {
             joinColumns = @JoinColumn(name = "user_registration_id"),
             inverseJoinColumns = @JoinColumn(name = "residential_type_id"))
     private List<ResidentialType> residentialTypes;
+
+    @ManyToMany(mappedBy = "userRegistrationList")
+    List<AddManagement> addManagementList;
 }

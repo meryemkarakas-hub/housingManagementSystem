@@ -245,7 +245,11 @@ public class UserServiceImpl implements UserService {
         Optional<UserRegistration> userFindByIdentityNumberRegistrationOptional = userRegistrationRepository.findByIdentityNumber(sessionDTO.getIdentityNumber());
         if (userFindByIdentityNumberRegistrationOptional.isPresent()) {
             List<ResidentialType> residentialTypeList = userFindByIdentityNumberRegistrationOptional.get().getResidentialTypes();
-            return residentialTypesMapper.toDto(residentialTypeList);
+            List<ResidentialTypesDTO> residentialTypesDTOList = new ArrayList<>();
+            for (ResidentialType rs : residentialTypeList) {
+                residentialTypesDTOList.add(residentialTypesMapper.toDto(rs));
+            }
+            return residentialTypesDTOList;
         }
         return null;
     }
