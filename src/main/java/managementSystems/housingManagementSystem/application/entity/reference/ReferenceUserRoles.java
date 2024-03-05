@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import managementSystems.housingManagementSystem.application.entity.user.UserRegistration;
+import managementSystems.housingManagementSystem.application.entity.user.UserRoles;
 
 import java.util.List;
 
@@ -20,4 +22,5 @@ public class ReferenceUserRoles {
 
     @Column(name = "user_roles", unique = true)
     private String userRoles;
+
 }

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import managementSystems.housingManagementSystem.application.entity.management.AddManagement;
+import managementSystems.housingManagementSystem.application.entity.management.ResidentialInformation;
 import managementSystems.housingManagementSystem.application.entity.residential.ResidentialType;
 
 import java.util.List;
@@ -27,5 +27,5 @@ public class ReferenceHousingTypes {
     private List<ResidentialType> residentialTypeList;
 
     @OneToMany(mappedBy = "referenceHousingTypes", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<AddManagement> addManagementList;
+    private List<ResidentialInformation> residentialInformationList;
 }

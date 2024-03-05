@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import managementSystems.housingManagementSystem.application.entity.management.AddManagement;
+import managementSystems.housingManagementSystem.application.entity.management.ResidentialInformation;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceUserRoles;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users_roles")

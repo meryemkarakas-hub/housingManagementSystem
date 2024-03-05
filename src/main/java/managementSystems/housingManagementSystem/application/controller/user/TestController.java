@@ -2,6 +2,7 @@ package managementSystems.housingManagementSystem.application.controller.user;
 
 import lombok.RequiredArgsConstructor;
 import managementSystems.housingManagementSystem.application.entity.user.UserRegistration;
+import managementSystems.housingManagementSystem.application.entity.user.UserRoles;
 import managementSystems.housingManagementSystem.application.repository.user.UserRegistrationRepository;
 import managementSystems.housingManagementSystem.application.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -24,7 +26,7 @@ public class TestController {
 
     @GetMapping("/test")
     ResponseEntity<UserRegistration> signUp() {
-        Optional<UserRegistration> userRegistration=userRegistrationRepository.findByIdentityNumber("49546385486");
+        Optional<UserRegistration> userRegistration=userRegistrationRepository.findByIdentityNumber("10232918646");
         return new ResponseEntity<>(userRegistration.get(), HttpStatus.OK);
     }
 

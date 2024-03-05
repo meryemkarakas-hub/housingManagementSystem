@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import managementSystems.housingManagementSystem.application.entity.management.AddManagement;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceGender;
 import managementSystems.housingManagementSystem.application.entity.residential.ResidentialType;
 
@@ -61,7 +60,4 @@ public class UserRegistration {
             joinColumns = @JoinColumn(name = "user_registration_id"),
             inverseJoinColumns = @JoinColumn(name = "residential_type_id"))
     private List<ResidentialType> residentialTypes;
-
-    @ManyToMany(mappedBy = "userRegistrationList")
-    List<AddManagement> addManagementList;
 }
