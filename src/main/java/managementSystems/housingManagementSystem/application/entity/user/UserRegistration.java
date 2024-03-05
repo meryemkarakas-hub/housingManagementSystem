@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import managementSystems.housingManagementSystem.application.dto.management.ManagerDTO;
+import managementSystems.housingManagementSystem.application.dto.management.ResidentDTO;
+import managementSystems.housingManagementSystem.application.entity.management.Manager;
+import managementSystems.housingManagementSystem.application.entity.management.Resident;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceGender;
 import managementSystems.housingManagementSystem.application.entity.residential.ResidentialType;
 
@@ -40,7 +44,7 @@ public class UserRegistration {
     private LocalDate dateOfBirth;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ref erence_gender_id", referencedColumnName = "id")
+    @JoinColumn(name = "reference_gender_id", referencedColumnName = "id")
     private ReferenceGender referenceGender;
 
     @Column(name = "kvkk")
@@ -60,4 +64,10 @@ public class UserRegistration {
             joinColumns = @JoinColumn(name = "user_registration_id"),
             inverseJoinColumns = @JoinColumn(name = "residential_type_id"))
     private List<ResidentialType> residentialTypes;
+
+    @OneToMany(mappedBy = "userRegistration", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Manager> managerList;
+
+    @OneToOne(mappedBy = "userRegistration", cascade = CascadeType.ALL)
+    private Resident resident;
 }

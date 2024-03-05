@@ -1,5 +1,6 @@
 package managementSystems.housingManagementSystem.application.entity.residential;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

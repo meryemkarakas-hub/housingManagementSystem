@@ -2,12 +2,14 @@ package managementSystems.housingManagementSystem.application.entity.management;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import managementSystems.housingManagementSystem.application.dto.management.ManagerDTO;
+import managementSystems.housingManagementSystem.application.dto.management.ResidentDTO;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceCity;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceCountry;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceHousingTypes;
+
+import java.util.List;
 
 @Entity
 @Table(name = "residential_info")
@@ -40,5 +42,11 @@ public class ResidentialInformation {
 
     @Column(name = "number_of_flats")
     private String numberOfFlats;
+
+    @OneToOne(mappedBy = "residentialInformation", cascade = CascadeType.ALL)
+    private Manager manager;
+
+    @OneToMany(mappedBy = "residentialInformation", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Resident> residentList;
 
 }
