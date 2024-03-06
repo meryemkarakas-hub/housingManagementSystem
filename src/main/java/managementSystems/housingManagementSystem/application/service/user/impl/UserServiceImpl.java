@@ -3,18 +3,26 @@ package managementSystems.housingManagementSystem.application.service.user.impl;
 import lombok.RequiredArgsConstructor;
 import managementSystems.housingManagementSystem.application.core.dto.GeneralMessageDTO;
 import managementSystems.housingManagementSystem.application.core.helper.ActivationCodeHelper;
+import managementSystems.housingManagementSystem.application.core.oauth.dto.SessionDTO;
 import managementSystems.housingManagementSystem.application.core.oauth.service.SessionService;
 import managementSystems.housingManagementSystem.application.core.service.MailSenderService;
 import managementSystems.housingManagementSystem.application.core.validator.Validator;
+import managementSystems.housingManagementSystem.application.dto.management.ManagementSelectResponseDTO;
 import managementSystems.housingManagementSystem.application.dto.residental.ResidentialTypesDTO;
 import managementSystems.housingManagementSystem.application.dto.user.ActivationDTO;
 import managementSystems.housingManagementSystem.application.dto.user.LoginDTO;
 import managementSystems.housingManagementSystem.application.dto.user.ResetPasswordDTO;
 import managementSystems.housingManagementSystem.application.dto.user.SignUpDTO;
+import managementSystems.housingManagementSystem.application.entity.management.Manager;
+import managementSystems.housingManagementSystem.application.entity.management.Resident;
+import managementSystems.housingManagementSystem.application.entity.management.ResidentialInformation;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceUserRoles;
+import managementSystems.housingManagementSystem.application.entity.residential.ResidentialType;
 import managementSystems.housingManagementSystem.application.entity.user.UserActivation;
 import managementSystems.housingManagementSystem.application.entity.user.UserRegistration;
 import managementSystems.housingManagementSystem.application.entity.user.UserRoles;
+import managementSystems.housingManagementSystem.application.mapper.management.ManagerMapper;
+import managementSystems.housingManagementSystem.application.mapper.management.ResidentialInformationMapper;
 import managementSystems.housingManagementSystem.application.mapper.residential.ResidentialTypesMapper;
 import managementSystems.housingManagementSystem.application.mapper.user.UserActivationMapper;
 import managementSystems.housingManagementSystem.application.mapper.user.UserRegistrationMapper;
@@ -57,6 +65,8 @@ public class UserServiceImpl implements UserService {
     private final SessionService sessionService;
 
     private final ResidentialTypesMapper residentialTypesMapper;
+
+    private final ResidentialInformationMapper residentialInformationMapper;
 
 
     @Override
@@ -239,17 +249,40 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<ResidentialTypesDTO> getResidentialType() {
-//        SessionDTO sessionDTO = sessionService.getSession();
-//        Optional<UserRegistration> userFindByIdentityNumberRegistrationOptional = userRegistrationRepository.findByIdentityNumber(sessionDTO.getIdentityNumber());
-//        if (userFindByIdentityNumberRegistrationOptional.isPresent()) {
-//            List<ResidentialType> residentialTypeList = userFindByIdentityNumberRegistrationOptional.get().getResidentialTypes();
-//            List<ResidentialTypesDTO> residentialTypesDTOList = new ArrayList<>();
-//            for (ResidentialType rs : residentialTypeList) {
-//                residentialTypesDTOList.add(residentialTypesMapper.toDto(rs));
-//            }
-//            return residentialTypesDTOList;
-//        }
+        SessionDTO sessionDTO = sessionService.getSession();
+        Optional<UserRegistration> userFindByIdentityNumberRegistrationOptional = userRegistrationRepository.findByIdentityNumber(sessionDTO.getIdentityNumber());
+        if (userFindByIdentityNumberRegistrationOptional.isPresent()) {
+            List<ResidentialType> residentialTypeList = userFindByIdentityNumberRegistrationOptional.get().getResidentialTypes();
+            List<ResidentialTypesDTO> residentialTypesDTOList = new ArrayList<>();
+            for (ResidentialType rs : residentialTypeList) {
+                residentialTypesDTOList.add(residentialTypesMapper.toDto(rs));
+            }
+            return residentialTypesDTOList;
+        }
         return null;
+    }
+
+    @Override
+    public List<ManagementSelectResponseDTO> getInformationManagementSelect() {
+        SessionDTO sessionDTO = sessionService.getSession();
+        Optional<UserRegistration> userRegistrationOptional = userRegistrationRepository.findByIdentityNumber(sessionDTO.getIdentityNumber());
+        List<ManagementSelectResponseDTO> managementSelectResponseDTOList = new ArrayList<>();
+        if (userRegistrationOptional.isPresent()) {
+            UserRegistration userRegistration = userRegistrationOptional.get();
+            List<Manager> managerList = userRegistration.getManagerList();
+            for (Manager manager : managerList) {
+                ResidentialInformation residentialInformation = manager.getResidentialInformation();
+                ManagementSelectResponseDTO managementSelectResponseDTO = residentialInformationMapper.toDto(residentialInformation, "Konut Yöneticisi");
+                managementSelectResponseDTOList.add(managementSelectResponseDTO);
+            }
+            Resident resident = userRegistration.getResident();
+            if (resident != null) {
+                ResidentialInformation residentialInformation = resident.getResidentialInformation();
+                ManagementSelectResponseDTO managementSelectResponseDTO = residentialInformationMapper.toDto(residentialInformation, "Konut Sakini");
+                managementSelectResponseDTOList.add(managementSelectResponseDTO);
+            }
+        }
+        return managementSelectResponseDTOList;
     }
 }
 

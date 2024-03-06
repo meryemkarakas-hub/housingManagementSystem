@@ -1,6 +1,7 @@
 package managementSystems.housingManagementSystem.application.service;
 
 import managementSystems.housingManagementSystem.application.core.dto.GeneralMessageDTO;
+import managementSystems.housingManagementSystem.application.dto.management.ManagementSelectResponseDTO;
 import managementSystems.housingManagementSystem.application.dto.residental.ResidentialTypesDTO;
 import managementSystems.housingManagementSystem.application.dto.user.ActivationDTO;
 import managementSystems.housingManagementSystem.application.dto.user.LoginDTO;
@@ -19,4 +20,7 @@ public interface UserService {
     GeneralMessageDTO resetPassword(ResetPasswordDTO resetPasswordDTO);
 
     List<ResidentialTypesDTO> getResidentialType();
+
+    List<ManagementSelectResponseDTO> getInformationManagementSelect();
+
 }

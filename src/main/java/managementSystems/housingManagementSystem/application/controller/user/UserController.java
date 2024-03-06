@@ -1,5 +1,6 @@
 package managementSystems.housingManagementSystem.application.controller.user;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import managementSystems.housingManagementSystem.application.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/api/user", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
     private final UserService userService;
 
@@ -26,5 +28,10 @@ public class UserController {
     @GetMapping("/residential-types")
     ResponseEntity<?> getResidentialType() {
         return new ResponseEntity<>(userService.getResidentialType(), HttpStatus.OK);
+    }
+
+    @GetMapping("/information/management-select")
+    ResponseEntity<?> getInformationManagementSelect() {
+        return new ResponseEntity<>(userService.getInformationManagementSelect(), HttpStatus.OK);
     }
 }
