@@ -8,6 +8,7 @@ import managementSystems.housingManagementSystem.application.core.oauth.service.
 import managementSystems.housingManagementSystem.application.core.service.MailSenderService;
 import managementSystems.housingManagementSystem.application.core.validator.Validator;
 import managementSystems.housingManagementSystem.application.dto.management.ManagementSelectResponseDTO;
+import managementSystems.housingManagementSystem.application.dto.management.SelectManagementDTO;
 import managementSystems.housingManagementSystem.application.dto.residental.ResidentialTypesDTO;
 import managementSystems.housingManagementSystem.application.dto.user.ActivationDTO;
 import managementSystems.housingManagementSystem.application.dto.user.LoginDTO;
@@ -21,7 +22,6 @@ import managementSystems.housingManagementSystem.application.entity.residential.
 import managementSystems.housingManagementSystem.application.entity.user.UserActivation;
 import managementSystems.housingManagementSystem.application.entity.user.UserRegistration;
 import managementSystems.housingManagementSystem.application.entity.user.UserRoles;
-import managementSystems.housingManagementSystem.application.mapper.management.ManagerMapper;
 import managementSystems.housingManagementSystem.application.mapper.management.ResidentialInformationMapper;
 import managementSystems.housingManagementSystem.application.mapper.residential.ResidentialTypesMapper;
 import managementSystems.housingManagementSystem.application.mapper.user.UserActivationMapper;
@@ -108,8 +108,8 @@ public class UserServiceImpl implements UserService {
         }
         UserRegistration userRegistration = userRegistrationMapper.toEntity(signUpDTO);
         String activationCode = ActivationCodeHelper.generateActivationCode();
-        //String activationUrlContent = activationUrl + activationCode;
-        //mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
+        String activationUrlContent = activationUrl + activationCode;
+        mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
         UserActivation userActivation = new UserActivation();
         userActivation.setActivationCode(activationCode);
         userActivation.setActivationStatus(false);
@@ -284,6 +284,13 @@ public class UserServiceImpl implements UserService {
         }
         return managementSelectResponseDTOList;
     }
+
+    @Override
+    public GeneralMessageDTO selectManagement(SelectManagementDTO selectManagementDTO) {
+        return null;
+    }
+
+
 }
 
 

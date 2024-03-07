@@ -1,16 +1,17 @@
 package managementSystems.housingManagementSystem.application.controller.user;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import managementSystems.housingManagementSystem.application.core.dto.GeneralMessageDTO;
+import managementSystems.housingManagementSystem.application.dto.management.SelectManagementDTO;
 import managementSystems.housingManagementSystem.application.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/user", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -33,5 +34,10 @@ public class UserController {
     @GetMapping("/information/management-select")
     ResponseEntity<?> getInformationManagementSelect() {
         return new ResponseEntity<>(userService.getInformationManagementSelect(), HttpStatus.OK);
+    }
+
+    @PostMapping("/management-select")
+    ResponseEntity<GeneralMessageDTO> selectManagement(@Valid @RequestBody SelectManagementDTO selectManagementDTO) {
+        return new ResponseEntity<>(userService.selectManagement(selectManagementDTO), HttpStatus.OK);
     }
 }
