@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SessionService {
 
-    private final HttpSession session;
+    private final HttpSession httpSession;
 
     public SessionDTO getSession(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         SessionDTO sessionDTO = new SessionDTO();
         sessionDTO.setIdentityNumber(auth.getName());
-        String userRole = (String) session.getAttribute("userRole");
-        Long residentialInfoId = (Long) session.getAttribute("residentialInfoId");
+        String userRole = (String) httpSession.getAttribute("userRole");
+        Long residentialInfoId = (Long) httpSession.getAttribute("residentialInfoId");
         sessionDTO.setResidentialInfoId(residentialInfoId);
         sessionDTO.setUserRole(userRole);
         return sessionDTO;
