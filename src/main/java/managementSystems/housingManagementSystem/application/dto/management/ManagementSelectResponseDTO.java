@@ -10,4 +10,5 @@ import lombok.Setter;
 public class ManagementSelectResponseDTO {
     private Long id;
     private String informationManagementSelect;
+    private String userRole;
 }

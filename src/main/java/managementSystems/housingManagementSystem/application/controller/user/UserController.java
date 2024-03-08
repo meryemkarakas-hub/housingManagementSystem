@@ -1,6 +1,8 @@
 package managementSystems.housingManagementSystem.application.controller.user;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import managementSystems.housingManagementSystem.application.core.dto.GeneralMessageDTO;
@@ -19,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
 @SecurityRequirement(name = "bearerAuth")
 public class UserController {
     private final UserService userService;
+
+    private final HttpServletRequest request;
+
 
     @GetMapping
     ResponseEntity<String> getActiveUserInfomation() {
@@ -40,4 +45,23 @@ public class UserController {
     ResponseEntity<GeneralMessageDTO> selectManagement(@Valid @RequestBody SelectManagementDTO selectManagementDTO) {
         return new ResponseEntity<>(userService.selectManagement(selectManagementDTO), HttpStatus.OK);
     }
+
+    @GetMapping("/checkSession")
+    public String checkSession() {
+        HttpSession session = request.getSession();
+
+        // Session'daki değerleri kontrol etme
+        Long userId = (Long) session.getAttribute("userId");
+        String userRole = (String) session.getAttribute("userRole");
+
+        if (userId != null && userRole != null) {
+            // Session'a kaydedilmiş değerler mevcut
+            // İstediğiniz işlemi yapabilirsiniz
+            return "Session is active!";
+        } else {
+            // Session'a kaydedilmiş değerler yok
+            return "Session is not active!";
+        }
+    }
 }
+

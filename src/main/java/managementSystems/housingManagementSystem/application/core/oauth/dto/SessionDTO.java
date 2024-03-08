@@ -10,5 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SessionDTO {
-    String identityNumber;
+    private String identityNumber;
+    private Long residentialInfoId;
+    private String userRole;
+
 }

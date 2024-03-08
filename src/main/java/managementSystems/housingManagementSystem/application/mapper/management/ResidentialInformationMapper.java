@@ -17,6 +17,7 @@ public interface ResidentialInformationMapper {
     default ManagementSelectResponseDTO toDto(ResidentialInformation entity, @Context String fixedValue) {
         ManagementSelectResponseDTO dto = toDto(entity);
         dto.setInformationManagementSelect(dto.getInformationManagementSelect()+"-"+fixedValue);
+        dto.setUserRole(fixedValue);
         return dto;
     }
 }
