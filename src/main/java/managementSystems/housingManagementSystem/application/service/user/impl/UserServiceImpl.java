@@ -297,7 +297,7 @@ public class UserServiceImpl implements UserService {
         // Session bilgilerini ayarla
         httpSession.setAttribute("userId", id);
         httpSession.setAttribute("userRole", userRole);
-        return null;
+        return new GeneralMessageDTO(1, "Ana sayfaya yönlendiriliyorsunuz.");
     }
 
 
