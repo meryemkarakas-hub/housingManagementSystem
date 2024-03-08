@@ -1,5 +1,7 @@
 package managementSystems.housingManagementSystem.application.service.user.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import managementSystems.housingManagementSystem.application.core.dto.GeneralMessageDTO;
 import managementSystems.housingManagementSystem.application.core.helper.ActivationCodeHelper;
@@ -67,6 +69,9 @@ public class UserServiceImpl implements UserService {
     private final ResidentialTypesMapper residentialTypesMapper;
 
     private final ResidentialInformationMapper residentialInformationMapper;
+
+    private final HttpServletRequest request;
+
 
 
     @Override
@@ -287,9 +292,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GeneralMessageDTO selectManagement(SelectManagementDTO selectManagementDTO) {
-        return null;
+        HttpSession session = request.getSession();
+        session.setAttribute("id", selectManagementDTO.getId());
+        session.setAttribute("userRole", selectManagementDTO.getUserRole());
+        return new GeneralMessageDTO(1, "Ana sayfaya yönlendiriliyorsunuz..");
     }
-
 
 }
 
