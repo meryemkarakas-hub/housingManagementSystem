@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
 
     private final ResidentialInformationMapper residentialInformationMapper;
 
-    private final HttpServletRequest request;
+    private final HttpSession session;
 
 
 
@@ -292,8 +292,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GeneralMessageDTO selectManagement(SelectManagementDTO selectManagementDTO) {
-        HttpSession session = request.getSession();
-        session.setAttribute("id", selectManagementDTO.getId());
+        session.setAttribute("residentialInfoId", selectManagementDTO.getId());
         session.setAttribute("userRole", selectManagementDTO.getUserRole());
         return new GeneralMessageDTO(1, "Ana sayfaya yönlendiriliyorsunuz..");
     }
