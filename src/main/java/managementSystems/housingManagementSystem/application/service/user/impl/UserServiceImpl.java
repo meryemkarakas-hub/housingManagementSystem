@@ -1,5 +1,6 @@
 package managementSystems.housingManagementSystem.application.service.user.impl;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import managementSystems.housingManagementSystem.application.core.dto.GeneralMessageDTO;
 import managementSystems.housingManagementSystem.application.core.helper.ActivationCodeHelper;
@@ -67,6 +68,9 @@ public class UserServiceImpl implements UserService {
     private final ResidentialTypesMapper residentialTypesMapper;
 
     private final ResidentialInformationMapper residentialInformationMapper;
+
+    private final HttpSession httpSession;
+
 
 
     @Override
@@ -217,8 +221,8 @@ public class UserServiceImpl implements UserService {
             if (userFindByIdentityNumberRegistrationOptional.get().getUserActivation().getActivationStatus()) {
                 if (userRegistrationFindByEmailAddressOptional.isPresent()) {
                     String activationCode = ActivationCodeHelper.generateActivationCode();
-                    //String activationUrlContent = activationUrl + activationCode;
-                    //mailSenderService.sendMail(resetPasswordDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
+                    String activationUrlContent = activationUrl + activationCode;
+                    mailSenderService.sendMail(resetPasswordDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
                     UserActivation existingUserActivation = userFindByIdentityNumberRegistrationOptional.get().getUserActivation();
                     if (existingUserActivation == null) {
                         existingUserActivation = new UserActivation();
@@ -287,6 +291,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GeneralMessageDTO selectManagement(SelectManagementDTO selectManagementDTO) {
+        Long id = selectManagementDTO.getId();
+        String userRole = selectManagementDTO.getUserRole();
+
+        // Session bilgilerini ayarla
+        httpSession.setAttribute("userId", id);
+        httpSession.setAttribute("userRole", userRole);
+
         return null;
     }
 
