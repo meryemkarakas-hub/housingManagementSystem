@@ -19,7 +19,7 @@ public class ReferenceCity {
     private Long id;
 
     @Column(name = "city_name", unique = true)
-    private String cityName;
+    private String city;
 
     @OneToMany(mappedBy = "referenceCity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ReferenceCountry> referenceCountryList;

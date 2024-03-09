@@ -19,7 +19,7 @@ public class ReferenceHousingTypesController {
 
     private final ReferenceHousingTypesService referenceHousingTypesService;
     @GetMapping(value = "/housing-types")
-    public ResponseEntity<List<ReferenceHousingTypesDTO>> getAllCitiesList() {
+    public ResponseEntity<List<ReferenceHousingTypesDTO>> getAllHousingTypesList() {
         List<ReferenceHousingTypesDTO> referenceHousingTypesDTOList = referenceHousingTypesService.getAllHousingTypesList();
         return new ResponseEntity<>(referenceHousingTypesDTOList, HttpStatus.OK);
     }
