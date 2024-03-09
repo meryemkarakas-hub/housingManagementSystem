@@ -21,6 +21,6 @@ public class ReferenceCountry {
     private ReferenceCity referenceCity;
 
     @Column(name = "country_name")
-    private String countryName;
+    private String country;
 
 }
