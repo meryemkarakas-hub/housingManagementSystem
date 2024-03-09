@@ -19,7 +19,7 @@ public class ReferenceCountryServiceImpl implements ReferenceCountryService {
     private final ReferenceCountryMapper referenceCountryMapper;
 
     @Override
-    public List<ReferenceCountryDTO> getAllCountryList() {
-        return referenceCountryRepository.getAllCountryList().stream().map(referenceCountryMapper::toDto).collect(Collectors.toList());
+    public List<ReferenceCountryDTO> getAllCountryListByCityId(Long cityId) {
+        return referenceCountryRepository.findReferenceCountryByCityId(cityId).stream().map(referenceCountryMapper::toDto).collect(Collectors.toList());
     }
 }

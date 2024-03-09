@@ -5,6 +5,6 @@ import managementSystems.housingManagementSystem.application.dto.reference.Refer
 import java.util.List;
 
 public interface ReferenceCountryService {
-    List<ReferenceCountryDTO> getAllCountryList();
+    List<ReferenceCountryDTO> getAllCountryListByCityId(Long cityId);
 
 }

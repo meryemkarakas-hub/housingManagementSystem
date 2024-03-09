@@ -9,5 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ReferenceCountryDTO {
     private Long id;
+    private Long cityId;
     private String country;
 }
