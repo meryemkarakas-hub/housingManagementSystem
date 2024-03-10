@@ -1,6 +1,7 @@
 package managementSystems.housingManagementSystem.application.service;
 
 import managementSystems.housingManagementSystem.application.core.dto.GeneralMessageDTO;
+import managementSystems.housingManagementSystem.application.dto.management.AddManagementDTO;
 import managementSystems.housingManagementSystem.application.dto.management.ManagementSelectResponseDTO;
 import managementSystems.housingManagementSystem.application.dto.management.SelectManagementDTO;
 import managementSystems.housingManagementSystem.application.dto.residental.ResidentialTypesDTO;
@@ -25,4 +26,6 @@ public interface UserService {
     List<ManagementSelectResponseDTO> getInformationManagementSelect();
 
     GeneralMessageDTO selectManagement(SelectManagementDTO selectManagementDTO);
+
+    GeneralMessageDTO addManagement(AddManagementDTO addManagementDTO);
 }

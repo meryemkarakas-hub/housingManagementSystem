@@ -47,8 +47,8 @@ public class UserController {
     }
 
     @PostMapping("/management-add")
-    ResponseEntity<GeneralMessageDTO> selectManagement(@Valid @RequestBody AddManagementDTO addManagementDTO) {
-        return null;
+    ResponseEntity<GeneralMessageDTO> addManagement(@Valid @RequestBody AddManagementDTO addManagementDTO) {
+        return new ResponseEntity<>(userService.addManagement(addManagementDTO), HttpStatus.OK);
     }
 
 

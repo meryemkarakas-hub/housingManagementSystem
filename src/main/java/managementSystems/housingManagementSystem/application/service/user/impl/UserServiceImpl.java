@@ -8,6 +8,7 @@ import managementSystems.housingManagementSystem.application.core.oauth.dto.Sess
 import managementSystems.housingManagementSystem.application.core.oauth.service.SessionService;
 import managementSystems.housingManagementSystem.application.core.service.MailSenderService;
 import managementSystems.housingManagementSystem.application.core.validator.Validator;
+import managementSystems.housingManagementSystem.application.dto.management.AddManagementDTO;
 import managementSystems.housingManagementSystem.application.dto.management.ManagementSelectResponseDTO;
 import managementSystems.housingManagementSystem.application.dto.management.SelectManagementDTO;
 import managementSystems.housingManagementSystem.application.dto.residental.ResidentialTypesDTO;
@@ -293,14 +294,16 @@ public class UserServiceImpl implements UserService {
     public GeneralMessageDTO selectManagement(SelectManagementDTO selectManagementDTO) {
         Long id = selectManagementDTO.getId();
         String userRole = selectManagementDTO.getUserRole();
-
         // Session bilgilerini ayarla
-        httpSession.setAttribute("userId", id);
+        httpSession.setAttribute("residentialInfoId", id);
         httpSession.setAttribute("userRole", userRole);
         return new GeneralMessageDTO(1, "Ana sayfaya yönlendiriliyorsunuz.");
     }
 
-
+    @Override
+    public GeneralMessageDTO addManagement(AddManagementDTO addManagementDTO) {
+        return null;
+    }
 }
 
 
