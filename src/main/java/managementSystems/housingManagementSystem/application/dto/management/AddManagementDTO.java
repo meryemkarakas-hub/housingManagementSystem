@@ -15,7 +15,7 @@ public class AddManagementDTO {
     private String country;
     private String address;
     private String apartmentName;
-    private String numberOfFlats;
+    private Integer numberOfFlats;
     private String siteApartmentName;
     private String siteSingleHouseName;
     private String numberOfSingleHouse;

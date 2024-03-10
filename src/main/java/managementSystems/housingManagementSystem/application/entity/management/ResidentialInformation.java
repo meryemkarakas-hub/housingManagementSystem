@@ -41,12 +41,11 @@ public class ResidentialInformation {
     private String apartmentName;
 
     @Column(name = "number_of_flats")
-    private String numberOfFlats;
+    private Integer numberOfFlats;
 
     @OneToOne(mappedBy = "residentialInformation", cascade = CascadeType.ALL)
     private Manager manager;
 
     @OneToMany(mappedBy = "residentialInformation", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Resident> residentList;
-
 }

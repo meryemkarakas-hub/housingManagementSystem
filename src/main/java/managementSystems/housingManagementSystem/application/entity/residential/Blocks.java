@@ -21,6 +21,9 @@ public class Blocks {
     @Column(name = "block_name", unique = true)
     private String blockName;
 
+    @Column(name = "number_of_flats", unique = true)
+    private Integer numberOfFlats;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "residential_type_id", referencedColumnName = "id")
     private ResidentialType residentialType;

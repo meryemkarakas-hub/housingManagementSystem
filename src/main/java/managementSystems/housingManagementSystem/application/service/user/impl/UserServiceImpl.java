@@ -28,6 +28,7 @@ import managementSystems.housingManagementSystem.application.mapper.management.R
 import managementSystems.housingManagementSystem.application.mapper.residential.ResidentialTypesMapper;
 import managementSystems.housingManagementSystem.application.mapper.user.UserActivationMapper;
 import managementSystems.housingManagementSystem.application.mapper.user.UserRegistrationMapper;
+import managementSystems.housingManagementSystem.application.repository.residential.ResidentialInformationRepository;
 import managementSystems.housingManagementSystem.application.repository.user.UserActivationRepository;
 import managementSystems.housingManagementSystem.application.repository.user.UserRegistrationRepository;
 import managementSystems.housingManagementSystem.application.service.UserService;
@@ -71,6 +72,8 @@ public class UserServiceImpl implements UserService {
     private final ResidentialInformationMapper residentialInformationMapper;
 
     private final HttpSession httpSession;
+
+    private final ResidentialInformationRepository residentialInformationRepository;
 
 
 
@@ -302,9 +305,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public GeneralMessageDTO addManagement(AddManagementDTO addManagementDTO) {
-        return null;
+        SessionDTO sessionDTO = sessionService.getSession();
+        Optional<UserRegistration> userRegistrationOptional = userRegistrationRepository.findByIdentityNumber(sessionDTO.getIdentityNumber());
+        if (userRegistrationOptional.isPresent()) {
+            UserRegistration userRegistration = userRegistrationOptional.get();
+            ResidentialInformation residentialInformation=residentialInformationMapper.toEntity(addManagementDTO);
+            Manager manager = new Manager();
+            manager.setUserRegistration(userRegistration);
+            manager.setResidentialInformation(residentialInformation);
+            residentialInformation.setManager(manager);
+
+            residentialInformationRepository.save(residentialInformation);
+
+            return new GeneralMessageDTO(1,"Management added successfully");
+        } else {
+            return new GeneralMessageDTO(0,"User not found");
+        }
     }
-}
+    }
+
 
 
 

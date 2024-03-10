@@ -1,5 +1,6 @@
 package managementSystems.housingManagementSystem.application.mapper.management;
 
+import managementSystems.housingManagementSystem.application.dto.management.AddManagementDTO;
 import managementSystems.housingManagementSystem.application.dto.management.ManagementSelectResponseDTO;
 import managementSystems.housingManagementSystem.application.entity.management.ResidentialInformation;
 import org.mapstruct.Context;
@@ -20,4 +21,8 @@ public interface ResidentialInformationMapper {
         dto.setUserRole(fixedValue);
         return dto;
     }
+    ResidentialInformation toEntity(AddManagementDTO entity);
+
+
+
 }
