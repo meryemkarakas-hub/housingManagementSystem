@@ -19,10 +19,9 @@ public interface ResidentialInformationMapper {
         return dto;
     }
     @Mappings({
-
+            @Mapping(source = "housingTypes" ,target="referenceHousingTypes.id"),
             @Mapping(source = "city" ,target="referenceCity.id"),
             @Mapping(source = "country" ,target="referenceCountry.id"),
-            @Mapping(source = "housingTypes" ,target="referenceHousingTypes.id")
     })
     ResidentialInformation toEntity(AddManagementDTO entity);
 

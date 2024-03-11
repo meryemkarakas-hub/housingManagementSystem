@@ -18,7 +18,7 @@ public class AddManagementDTO {
     private Integer numberOfFlats;
     private String siteApartmentName;
     private String siteSingleHouseName;
-    private String numberOfSingleHouse;
-    private String blockCount;
+    private Integer numberOfSingleHouse;
+    private Integer blockCount;
     private List<BlocksDTO> blocks;
 }

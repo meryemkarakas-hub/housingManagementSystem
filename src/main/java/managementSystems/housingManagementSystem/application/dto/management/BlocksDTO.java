@@ -9,5 +9,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BlocksDTO {
     private String blockName;
-    private String numberOfFlatsForBlock;
+    private Integer numberOfFlatsForBlock;
 }

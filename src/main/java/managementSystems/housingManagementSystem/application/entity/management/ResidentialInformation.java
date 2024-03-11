@@ -40,8 +40,20 @@ public class ResidentialInformation {
     @Column(name = "apartment_name")
     private String apartmentName;
 
+    @Column(name = "site_apartment_name")
+    private String siteApartmentName;
+
+    @Column(name = "site_single_house_name")
+    private String siteSingleHouseName;
+
     @Column(name = "number_of_flats")
     private Integer numberOfFlats;
+
+    @Column(name = "number_of_blocks")
+    private Integer blockCount;
+
+    @Column(name = "number_of_single_house")
+    private Integer numberOfSingleHouse;
 
     @OneToOne(mappedBy = "residentialInformation", cascade = CascadeType.ALL)
     private Manager manager;
