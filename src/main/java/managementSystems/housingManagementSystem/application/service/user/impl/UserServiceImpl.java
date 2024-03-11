@@ -315,9 +315,9 @@ public class UserServiceImpl implements UserService {
             manager.setResidentialInformation(residentialInformation);
             residentialInformation.setManager(manager);
             residentialInformationRepository.save(residentialInformation);
-            return new GeneralMessageDTO(1,"İşlem başarıyla gerçekleştirildi.");
+            return new GeneralMessageDTO(1,"İşleminiz başarıyla gerçekleştirildi.Ana sayfaya yönlendiriliyorsunuz.");
         } else {
-            return new GeneralMessageDTO(0,"İşlem gerçekleştirilemedi.");
+            return new GeneralMessageDTO(0,"İşleminiz gerçekleştirilemedi.");
         }
     }
     }
