@@ -116,8 +116,8 @@ public class UserServiceImpl implements UserService {
         }
         UserRegistration userRegistration = userRegistrationMapper.toEntity(signUpDTO);
         String activationCode = ActivationCodeHelper.generateActivationCode();
-        String activationUrlContent = activationUrl + activationCode;
-        mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
+        //String activationUrlContent = activationUrl + activationCode;
+        //mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
         UserActivation userActivation = new UserActivation();
         userActivation.setActivationCode(activationCode);
         userActivation.setActivationStatus(false);
