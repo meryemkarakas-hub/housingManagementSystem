@@ -314,12 +314,10 @@ public class UserServiceImpl implements UserService {
             manager.setUserRegistration(userRegistration);
             manager.setResidentialInformation(residentialInformation);
             residentialInformation.setManager(manager);
-
             residentialInformationRepository.save(residentialInformation);
-
-            return new GeneralMessageDTO(1,"Management added successfully");
+            return new GeneralMessageDTO(1,"İşlem başarıyla gerçekleştirildi.");
         } else {
-            return new GeneralMessageDTO(0,"User not found");
+            return new GeneralMessageDTO(0,"İşlem gerçekleştirilemedi.");
         }
     }
     }

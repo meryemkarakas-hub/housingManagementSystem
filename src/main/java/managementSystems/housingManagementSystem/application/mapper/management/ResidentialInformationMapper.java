@@ -3,10 +3,7 @@ package managementSystems.housingManagementSystem.application.mapper.management;
 import managementSystems.housingManagementSystem.application.dto.management.AddManagementDTO;
 import managementSystems.housingManagementSystem.application.dto.management.ManagementSelectResponseDTO;
 import managementSystems.housingManagementSystem.application.entity.management.ResidentialInformation;
-import org.mapstruct.Context;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface ResidentialInformationMapper {
@@ -21,6 +18,12 @@ public interface ResidentialInformationMapper {
         dto.setUserRole(fixedValue);
         return dto;
     }
+    @Mappings({
+
+            @Mapping(source = "city" ,target="referenceCity.id"),
+            @Mapping(source = "country" ,target="referenceCountry.id"),
+            @Mapping(source = "housingTypes" ,target="referenceHousingTypes.id")
+    })
     ResidentialInformation toEntity(AddManagementDTO entity);
 
 

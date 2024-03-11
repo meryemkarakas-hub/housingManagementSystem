@@ -10,9 +10,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class AddManagementDTO {
-    private String housingTypes;
-    private String city;
-    private String country;
+    private Long housingTypes;
+    private Long city;
+    private Long country;
     private String address;
     private String apartmentName;
     private Integer numberOfFlats;
