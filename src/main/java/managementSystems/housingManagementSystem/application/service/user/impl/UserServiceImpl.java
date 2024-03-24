@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import managementSystems.housingManagementSystem.application.core.dto.GeneralMessageDTO;
 import managementSystems.housingManagementSystem.application.core.helper.ActivationCodeHelper;
 import managementSystems.housingManagementSystem.application.core.oauth.dto.SessionDTO;
+import managementSystems.housingManagementSystem.application.core.oauth.jwt.JwtUtils;
+import managementSystems.housingManagementSystem.application.core.oauth.response.JwtResponse;
 import managementSystems.housingManagementSystem.application.core.oauth.service.SessionService;
+import managementSystems.housingManagementSystem.application.core.oauth.service.UserDetailsImpl;
 import managementSystems.housingManagementSystem.application.core.service.MailSenderService;
 import managementSystems.housingManagementSystem.application.core.validator.Validator;
 import managementSystems.housingManagementSystem.application.dto.management.AddManagementDTO;
@@ -33,6 +36,11 @@ import managementSystems.housingManagementSystem.application.repository.user.Use
 import managementSystems.housingManagementSystem.application.repository.user.UserRegistrationRepository;
 import managementSystems.housingManagementSystem.application.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,6 +51,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -75,19 +84,21 @@ public class UserServiceImpl implements UserService {
 
     private final ResidentialInformationRepository residentialInformationRepository;
 
+    private final AuthenticationManager authenticationManager;
 
+    private final JwtUtils jwtUtils;
 
     @Override
     public GeneralMessageDTO signUp(SignUpDTO signUpDTO) {
         Validator validator = new Validator();
-        validateLoginDTO(validator, signUpDTO);
+        validateSignUpDTO(validator, signUpDTO);
         if (!validator.isValid()) {
             return new GeneralMessageDTO(0, validator.getErrorMessage());
         }
         return checkIfUserExists(signUpDTO);
     }
 
-    private void validateLoginDTO(Validator validator, SignUpDTO signUpDTO) {
+    private void validateSignUpDTO(Validator validator, SignUpDTO signUpDTO) {
         validator.validateNotNull(signUpDTO.getUserRole(), "Kullanıcı Rolü");
         validator.validateNotNullOrEmpty(signUpDTO.getIdentityNumber(), "TC Kimlik Numarası");
         validator.validateNotNullOrEmpty(signUpDTO.getName(), "Ad");
@@ -116,8 +127,8 @@ public class UserServiceImpl implements UserService {
         }
         UserRegistration userRegistration = userRegistrationMapper.toEntity(signUpDTO);
         String activationCode = ActivationCodeHelper.generateActivationCode();
-        //String activationUrlContent = activationUrl + activationCode;
-        //mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
+        String activationUrlContent = activationUrl + activationCode;
+        mailSenderService.sendMail(signUpDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
         UserActivation userActivation = new UserActivation();
         userActivation.setActivationCode(activationCode);
         userActivation.setActivationStatus(false);
@@ -179,28 +190,48 @@ public class UserServiceImpl implements UserService {
         validator.validateNotNullOrEmpty(activationDTO.getActivationCode(), "Aktivasyon Kodu");
     }
 
-    @Deprecated
     @Override
-    public GeneralMessageDTO login(LoginDTO loginDTO) {
+    public ResponseEntity<?> login(LoginDTO loginDTO) {
         Validator validator = new Validator();
         validateLoginDTO(validator, loginDTO);
+
         if (!validator.isValid()) {
-            return new GeneralMessageDTO(0, validator.getErrorMessage());
+            return ResponseEntity.badRequest().body(new GeneralMessageDTO(0, validator.getErrorMessage()));
         }
+
         Optional<UserRegistration> userRegistrationFindByIdentityNumberOptional = userRegistrationRepository.findByIdentityNumber(loginDTO.getIdentityNumber());
+
         if (userRegistrationFindByIdentityNumberOptional.isPresent()) {
-            if (userRegistrationFindByIdentityNumberOptional.get().getUserActivation().getActivationStatus()) {
-                if (isPasswordCorrect(loginDTO.getPassword(), userRegistrationFindByIdentityNumberOptional.get().getPassword())) {
-                    userRegistrationFindByIdentityNumberOptional.get().getUserActivation().setLastLoginTime(LocalDateTime.now());
-                    userRegistrationRepository.save(userRegistrationFindByIdentityNumberOptional.get());
-                    return new GeneralMessageDTO(1, "İşleminiz başarıyla gerçekleşmiştir. Sistemimize yönlendiriliyorsunuz.");
+            UserRegistration userRegistration = userRegistrationFindByIdentityNumberOptional.get();
+            if (userRegistration.getUserActivation().getActivationStatus()) {
+                if (isPasswordCorrect(loginDTO.getPassword(), userRegistration.getPassword())) {
+                    userRegistration.getUserActivation().setLastLoginTime(LocalDateTime.now());
+                    userRegistrationRepository.save(userRegistration);
+
+                    // Generate JWT token and construct response
+                    Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getIdentityNumber(), loginDTO.getPassword()));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    String jwt = jwtUtils.generateJwtToken(authentication);
+                    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+                    List<String> roles = userDetails.getAuthorities().stream()
+                            .map(item -> item.getAuthority())
+                            .collect(Collectors.toList());
+                    return ResponseEntity.ok().body(new JwtResponse(jwt,
+                            userDetails.getId(),
+                            userDetails.getUsername(),
+                            userDetails.getIdentityNumber(),
+                            roles));
+                } else {
+                    return ResponseEntity.badRequest().body(new GeneralMessageDTO(0, "Lütfen kayıt olurken oluşturmuş olduğunuz şifre ile giriş yapınız"));
                 }
-                return new GeneralMessageDTO(0, "Lütfen kayıt olurken oluşturmuş olduğunuz şifre ile giriş yapınız");
+            } else {
+                return ResponseEntity.badRequest().body(new GeneralMessageDTO(0, "Lütfen aktivasyon işlemini tamamladıktan sonra giriş yapınız."));
             }
-            return new GeneralMessageDTO(0, "Lütfen aktivasyon işlemini tamamladıktan sonra giriş yapınız.");
+        } else {
+            return ResponseEntity.badRequest().body(new GeneralMessageDTO(0, "Giriş yapmak istediğiniz TC kimlik numarası ile daha önce kayıt işlemi gerçekleşmemiştir."));
         }
-        return new GeneralMessageDTO(0, "Giriş yapmak istediğiniz TC kimlik numarası ile daha önce kayıt işlemi gerçekleşmemiştir.");
     }
+
 
     private void validateLoginDTO(Validator validator, LoginDTO loginDTO) {
         validator.validateNotNullOrEmpty(loginDTO.getIdentityNumber(), "TC Kimlik Numarası");
@@ -225,8 +256,8 @@ public class UserServiceImpl implements UserService {
             if (userFindByIdentityNumberRegistrationOptional.get().getUserActivation().getActivationStatus()) {
                 if (userRegistrationFindByEmailAddressOptional.isPresent()) {
                     String activationCode = ActivationCodeHelper.generateActivationCode();
-                    //String activationUrlContent = activationUrl + activationCode;
-                    //mailSenderService.sendMail(resetPasswordDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
+                    String activationUrlContent = activationUrl + activationCode;
+                    mailSenderService.sendMail(resetPasswordDTO.getEmailAddress(), "Aktivasyon", ICERIK + activationUrlContent);
                     UserActivation existingUserActivation = userFindByIdentityNumberRegistrationOptional.get().getUserActivation();
                     if (existingUserActivation == null) {
                         existingUserActivation = new UserActivation();

@@ -9,6 +9,7 @@ import managementSystems.housingManagementSystem.application.dto.user.Activation
 import managementSystems.housingManagementSystem.application.dto.user.LoginDTO;
 import managementSystems.housingManagementSystem.application.dto.user.ResetPasswordDTO;
 import managementSystems.housingManagementSystem.application.dto.user.SignUpDTO;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface UserService {
 
     GeneralMessageDTO activation(ActivationDTO activationDTO);
 
-    GeneralMessageDTO login(LoginDTO loginDTO);
+    ResponseEntity<?> login(LoginDTO loginDTO);
 
     GeneralMessageDTO resetPassword(ResetPasswordDTO resetPasswordDTO);
 
