@@ -14,10 +14,22 @@ public interface ResidentialInformationMapper {
 
     default ManagementSelectResponseDTO toDto(ResidentialInformation entity, @Context String fixedValue) {
         ManagementSelectResponseDTO dto = toDto(entity);
-        dto.setInformationManagementSelect(dto.getInformationManagementSelect()+"-"+fixedValue);
+        String informationType = "";
+
+        if (entity.getApartmentName() != null) {
+            informationType = "Apartman";
+        } else if (entity.getSiteApartmentName() != null) {
+            informationType = "Site(Apartman)";
+        } else if (entity.getSiteSingleHouseName() != null) {
+            informationType = "Site(Müstakil)";
+        }
+
+        dto.setInformationManagementSelect(dto.getInformationManagementSelect() + "-" + informationType + "-" + fixedValue);
         dto.setUserRole(fixedValue);
+
         return dto;
     }
+
     @Mappings({
             @Mapping(source = "housingTypes" ,target="referenceHousingTypes.id"),
             @Mapping(source = "city" ,target="referenceCity.id"),
