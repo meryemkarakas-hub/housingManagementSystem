@@ -7,7 +7,7 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface ResidentialInformationMapper {
-    @Mapping(source = "apartmentName" ,target="informationManagementSelect")
+    @Mapping(target = "informationManagementSelect", expression = "java(entity.getApartmentName() != null ? entity.getApartmentName() : (entity.getSiteApartmentName() != null ? entity.getSiteApartmentName() : entity.getSiteSingleHouseName()))")
     ManagementSelectResponseDTO toDto(ResidentialInformation entity);
 
 
