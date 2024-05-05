@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import managementSystems.housingManagementSystem.application.entity.management.ResidentialInformation;
 
 import java.util.List;
 
@@ -22,12 +23,16 @@ public class Blocks {
     private String blockName;
 
     @Column(name = "number_of_flats", unique = true)
-    private Integer numberOfFlats;
+    private Integer numberOfFlatsForBlock;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "residential_type_id", referencedColumnName = "id")
-    private ResidentialType residentialType;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "residential_type_id", referencedColumnName = "id")
+//    private ResidentialType residentialType;
 
     @OneToMany(mappedBy = "blocks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Homes> homes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "resindential_info_id", referencedColumnName = "id")
+    private ResidentialInformation residentialInformation;
 }

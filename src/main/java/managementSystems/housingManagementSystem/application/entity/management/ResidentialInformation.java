@@ -2,12 +2,13 @@ package managementSystems.housingManagementSystem.application.entity.management;
 
 
 import jakarta.persistence.*;
-import lombok.*;
-import managementSystems.housingManagementSystem.application.dto.management.ManagerDTO;
-import managementSystems.housingManagementSystem.application.dto.management.ResidentDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceCity;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceCountry;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceHousingTypes;
+import managementSystems.housingManagementSystem.application.entity.residential.Blocks;
 
 import java.util.List;
 
@@ -60,4 +61,7 @@ public class ResidentialInformation {
 
     @OneToMany(mappedBy = "residentialInformation", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Resident> residentList;
+
+    @OneToMany(mappedBy = "residentialInformation", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Blocks> blocksList;
 }

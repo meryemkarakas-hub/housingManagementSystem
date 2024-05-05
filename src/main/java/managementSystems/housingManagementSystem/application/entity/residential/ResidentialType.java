@@ -1,6 +1,5 @@
 package managementSystems.housingManagementSystem.application.entity.residential;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +27,6 @@ public class ResidentialType {
     @ManyToMany(mappedBy = "residentialTypes")
     private List<UserRegistration> userRegistrations;
 
-    @OneToMany(mappedBy = "residentialType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Blocks> blocks;
+//    @OneToMany(mappedBy = "residentialType", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    private List<Blocks> blocks;
 }

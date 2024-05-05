@@ -12,6 +12,7 @@ import managementSystems.housingManagementSystem.application.core.oauth.service.
 import managementSystems.housingManagementSystem.application.core.service.MailSenderService;
 import managementSystems.housingManagementSystem.application.core.validator.Validator;
 import managementSystems.housingManagementSystem.application.dto.management.AddManagementDTO;
+import managementSystems.housingManagementSystem.application.dto.management.BlocksDTO;
 import managementSystems.housingManagementSystem.application.dto.management.ManagementSelectResponseDTO;
 import managementSystems.housingManagementSystem.application.dto.management.SelectManagementDTO;
 import managementSystems.housingManagementSystem.application.dto.residental.ResidentialTypesDTO;
@@ -23,11 +24,13 @@ import managementSystems.housingManagementSystem.application.entity.management.M
 import managementSystems.housingManagementSystem.application.entity.management.Resident;
 import managementSystems.housingManagementSystem.application.entity.management.ResidentialInformation;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceUserRoles;
+import managementSystems.housingManagementSystem.application.entity.residential.Blocks;
 import managementSystems.housingManagementSystem.application.entity.residential.ResidentialType;
 import managementSystems.housingManagementSystem.application.entity.user.UserActivation;
 import managementSystems.housingManagementSystem.application.entity.user.UserRegistration;
 import managementSystems.housingManagementSystem.application.entity.user.UserRoles;
 import managementSystems.housingManagementSystem.application.mapper.management.ResidentialInformationMapper;
+import managementSystems.housingManagementSystem.application.mapper.residential.BlocksMapper;
 import managementSystems.housingManagementSystem.application.mapper.residential.ResidentialTypesMapper;
 import managementSystems.housingManagementSystem.application.mapper.user.UserActivationMapper;
 import managementSystems.housingManagementSystem.application.mapper.user.UserRegistrationMapper;
@@ -79,6 +82,8 @@ public class UserServiceImpl implements UserService {
     private final ResidentialTypesMapper residentialTypesMapper;
 
     private final ResidentialInformationMapper residentialInformationMapper;
+
+    private final BlocksMapper blocksMapper;
 
     private final HttpSession httpSession;
 
@@ -340,18 +345,30 @@ public class UserServiceImpl implements UserService {
         Optional<UserRegistration> userRegistrationOptional = userRegistrationRepository.findByIdentityNumber(sessionDTO.getIdentityNumber());
         if (userRegistrationOptional.isPresent()) {
             UserRegistration userRegistration = userRegistrationOptional.get();
-            ResidentialInformation residentialInformation=residentialInformationMapper.toEntity(addManagementDTO);
+            ResidentialInformation residentialInformation = residentialInformationMapper.toEntity(addManagementDTO);
             Manager manager = new Manager();
             manager.setUserRegistration(userRegistration);
             manager.setResidentialInformation(residentialInformation);
             residentialInformation.setManager(manager);
+            if (addManagementDTO.getHousingTypes() == 2) {
+                if (residentialInformation.getBlocksList() == null) {
+                    residentialInformation.setBlocksList(new ArrayList<>());
+                }
+                if (addManagementDTO.getBlocks() != null && !addManagementDTO.getBlocks().isEmpty()) {
+                    for (BlocksDTO blocksDTO : addManagementDTO.getBlocks()) {
+                        Blocks blocks = blocksMapper.toEntity(blocksDTO);
+                        blocks.setResidentialInformation(residentialInformation);
+                        residentialInformation.getBlocksList().add(blocks);
+                    }
+                }
+            }
             residentialInformationRepository.save(residentialInformation);
-            return new GeneralMessageDTO(1,"İşleminiz başarıyla gerçekleştirildi.Ana sayfaya yönlendiriliyorsunuz.");
+            return new GeneralMessageDTO(1, "İşleminiz başarıyla gerçekleştirildi.Ana sayfaya yönlendiriliyorsunuz.");
         } else {
-            return new GeneralMessageDTO(0,"İşleminiz gerçekleştirilemedi.");
+            return new GeneralMessageDTO(0, "İşleminiz gerçekleştirilemedi.");
         }
     }
-    }
+}
 
 
 
