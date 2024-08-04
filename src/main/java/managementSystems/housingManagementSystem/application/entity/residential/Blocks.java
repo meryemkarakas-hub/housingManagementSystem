@@ -19,10 +19,10 @@ public class Blocks {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "block_name", unique = true)
+    @Column(name = "block_name")
     private String blockName;
 
-    @Column(name = "number_of_flats", unique = true)
+    @Column(name = "number_of_flats")
     private Integer numberOfFlatsForBlock;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
