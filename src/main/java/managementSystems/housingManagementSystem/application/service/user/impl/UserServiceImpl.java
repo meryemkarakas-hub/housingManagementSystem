@@ -37,6 +37,7 @@ import managementSystems.housingManagementSystem.application.mapper.user.UserReg
 import managementSystems.housingManagementSystem.application.repository.residential.ResidentialInformationRepository;
 import managementSystems.housingManagementSystem.application.repository.user.UserActivationRepository;
 import managementSystems.housingManagementSystem.application.repository.user.UserRegistrationRepository;
+import managementSystems.housingManagementSystem.application.repository.user.UsersRolesRepository;
 import managementSystems.housingManagementSystem.application.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -92,6 +93,8 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
 
     private final JwtUtils jwtUtils;
+
+    private final UsersRolesRepository usersRolesRepository;
 
     @Override
     public GeneralMessageDTO signUp(SignUpDTO signUpDTO) {
@@ -345,27 +348,66 @@ public class UserServiceImpl implements UserService {
         Optional<UserRegistration> userRegistrationOptional = userRegistrationRepository.findByIdentityNumber(sessionDTO.getIdentityNumber());
         if (userRegistrationOptional.isPresent()) {
             UserRegistration userRegistration = userRegistrationOptional.get();
-            ResidentialInformation residentialInformation = residentialInformationMapper.toEntity(addManagementDTO);
-            Manager manager = new Manager();
-            manager.setUserRegistration(userRegistration);
-            manager.setResidentialInformation(residentialInformation);
-            residentialInformation.setManager(manager);
-            if (addManagementDTO.getHousingTypes() == 2) {
-                if (residentialInformation.getBlocksList() == null) {
-                    residentialInformation.setBlocksList(new ArrayList<>());
-                }
-                if (addManagementDTO.getBlocks() != null && !addManagementDTO.getBlocks().isEmpty()) {
-                    for (BlocksDTO blocksDTO : addManagementDTO.getBlocks()) {
-                        Blocks blocks = blocksMapper.toEntity(blocksDTO);
-                        blocks.setResidentialInformation(residentialInformation);
-                        residentialInformation.getBlocksList().add(blocks);
+            Optional<UserRoles> usersRolesOptional = usersRolesRepository.findByUserRegistrationId(userRegistration.getId());
+            if (usersRolesOptional.isPresent()) {
+                UserRoles userRoles = usersRolesOptional.get();
+                Long roleId = userRoles.getReferenceUserRoles().getId();
+
+                ResidentialInformation residentialInformation = residentialInformationMapper.toEntity(addManagementDTO);
+
+                if (roleId == 1) {
+                    Manager manager = new Manager();
+                    manager.setUserRegistration(userRegistration);
+                    manager.setResidentialInformation(residentialInformation);
+                    residentialInformation.setManager(manager);
+
+                    if (addManagementDTO.getHousingTypes() == 2) {
+                        if (residentialInformation.getBlocksList() == null) {
+                            residentialInformation.setBlocksList(new ArrayList<>());
+                        }
+                        if (addManagementDTO.getBlocks() != null && !addManagementDTO.getBlocks().isEmpty()) {
+                            for (BlocksDTO blocksDTO : addManagementDTO.getBlocks()) {
+                                Blocks blocks = blocksMapper.toEntity(blocksDTO);
+                                blocks.setResidentialInformation(residentialInformation);
+                                residentialInformation.getBlocksList().add(blocks);
+                            }
+                        }
                     }
+
+                    residentialInformationRepository.save(residentialInformation);
+                    return new GeneralMessageDTO(1, "İşleminiz başarıyla gerçekleştirildi.Ana sayfaya yönlendiriliyorsunuz.");
+
+                } else if (roleId == 2) {
+                    Resident resident = new Resident();
+                    resident.setUserRegistration(userRegistration);
+                    resident.setResidentialInformation(residentialInformation);
+
+                    if (residentialInformation.getResidentList() == null) {
+                        residentialInformation.setResidentList(new ArrayList<>());
+                    }
+                    residentialInformation.getResidentList().add(resident);
+                    if (addManagementDTO.getHousingTypes() == 2) {
+                        if (residentialInformation.getBlocksList() == null) {
+                            residentialInformation.setBlocksList(new ArrayList<>());
+                        }
+                        if (addManagementDTO.getBlocks() != null && !addManagementDTO.getBlocks().isEmpty()) {
+                            for (BlocksDTO blocksDTO : addManagementDTO.getBlocks()) {
+                                Blocks blocks = blocksMapper.toEntity(blocksDTO);
+                                blocks.setResidentialInformation(residentialInformation);
+                                residentialInformation.getBlocksList().add(blocks);
+                            }
+                        }
+                    }
+                    residentialInformationRepository.save(residentialInformation);
+                    return new GeneralMessageDTO(1, "İşleminiz başarıyla gerçekleştirildi. Ana sayfaya yönlendiriliyorsunuz.");
+                } else {
+                    return new GeneralMessageDTO(0, "Geçersiz kullanıcı rolü.");
                 }
+            } else {
+                return new GeneralMessageDTO(0, "Kullanıcı rolü bulunamadı.");
             }
-            residentialInformationRepository.save(residentialInformation);
-            return new GeneralMessageDTO(1, "İşleminiz başarıyla gerçekleştirildi.Ana sayfaya yönlendiriliyorsunuz.");
         } else {
-            return new GeneralMessageDTO(0, "İşleminiz gerçekleştirilemedi.");
+            return new GeneralMessageDTO(0, "Kullanıcı kaydı bulunamadı.");
         }
     }
 }
