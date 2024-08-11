@@ -35,4 +35,7 @@ public class Blocks {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resindential_info_id", referencedColumnName = "id")
     private ResidentialInformation residentialInformation;
+
+    @OneToMany(mappedBy = "blocks", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<HousingInformation> housingInformationList;
 }
