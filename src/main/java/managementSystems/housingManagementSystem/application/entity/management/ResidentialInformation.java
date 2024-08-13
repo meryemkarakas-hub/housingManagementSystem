@@ -9,6 +9,7 @@ import managementSystems.housingManagementSystem.application.entity.reference.Re
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceCountry;
 import managementSystems.housingManagementSystem.application.entity.reference.ReferenceHousingTypes;
 import managementSystems.housingManagementSystem.application.entity.residential.Blocks;
+import managementSystems.housingManagementSystem.application.entity.residential.HousingInformation;
 
 import java.util.List;
 
@@ -64,4 +65,8 @@ public class ResidentialInformation {
 
     @OneToMany(mappedBy = "residentialInformation", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Blocks> blocksList;
+
+    @OneToMany(mappedBy = "residentialInformation", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<HousingInformation> housingInformationList;
+
 }

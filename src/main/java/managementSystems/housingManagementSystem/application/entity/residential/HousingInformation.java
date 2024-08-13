@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import managementSystems.housingManagementSystem.application.entity.reference.ReferenceHousingTypes;
+import managementSystems.housingManagementSystem.application.entity.management.ResidentialInformation;
 
 @Entity
 @Table(name = "housing_information")
@@ -18,8 +18,8 @@ public class HousingInformation {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reference_housing_types_id", referencedColumnName = "id")
-    private ReferenceHousingTypes referenceHousingTypes;
+    @JoinColumn(name = "residential_info_id", referencedColumnName = "id")
+    private ResidentialInformation residentialInformation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blocks_id", referencedColumnName = "id")
