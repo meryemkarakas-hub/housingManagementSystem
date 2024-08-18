@@ -27,7 +27,7 @@ public class HousingManagementController {
     }
 
     @PostMapping("/add-housing-information")
-    public List<Map<String, String>> uploadExcelFile(@RequestParam("file") MultipartFile file) {
-        return housingManagementService.parseExcelFile(file);
+    public List<Map<String, String>> uploadExcelFile(@RequestParam("blockName") String blockName,@RequestParam("file") MultipartFile file) {
+        return housingManagementService.parseExcelFile(blockName,file);
     }
 }

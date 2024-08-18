@@ -9,5 +9,5 @@ import java.util.Map;
 public interface HousingManagementService {
     List<HousingInformationBlocksDTO> getAllBlockNameList();
 
-    List<Map<String, String>> parseExcelFile(MultipartFile file);
+    List<Map<String, String>> parseExcelFile(String blockName,MultipartFile file);
 }
