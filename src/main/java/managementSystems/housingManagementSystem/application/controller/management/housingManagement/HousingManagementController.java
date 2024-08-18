@@ -7,11 +7,11 @@ import managementSystems.housingManagementSystem.application.service.management.
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/housing-management", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -24,5 +24,10 @@ public class HousingManagementController {
     public ResponseEntity<List<HousingInformationBlocksDTO>> getAllBlockNameList() {
         List<HousingInformationBlocksDTO> housingInformationBlocksDTOList = housingManagementService.getAllBlockNameList();
         return new ResponseEntity<>(housingInformationBlocksDTOList, HttpStatus.OK);
+    }
+
+    @PostMapping("/add-housing-information")
+    public List<Map<String, String>> uploadExcelFile(@RequestParam("file") MultipartFile file) {
+        return housingManagementService.parseExcelFile(file);
     }
 }
