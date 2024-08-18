@@ -1,5 +1,6 @@
 package managementSystems.housingManagementSystem.application.controller.management.housingManagement;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import managementSystems.housingManagementSystem.application.dto.management.housingManagement.HousingInformationBlocksDTO;
 import managementSystems.housingManagementSystem.application.service.management.housingManagement.HousingManagementService;
@@ -13,8 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/housing-management", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class HousingManagementController {
     private final HousingManagementService housingManagementService;
 
